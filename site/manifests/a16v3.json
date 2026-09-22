@@ -1,0 +1,13 @@
+{
+  "name": "Tasmota for KinCony KC868-A16 v3",
+  "version": "dev",
+  "home_assistant_domain": "tasmota",
+  "new_install_prompt_erase": true,
+  "new_install_improv_wait_time": 15,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [{ "path": "../firmware/tasmota32s3-a16v3.factory.bin", "offset": 0 }]
+    }
+  ]
+}

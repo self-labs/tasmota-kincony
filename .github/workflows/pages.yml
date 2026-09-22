@@ -1,0 +1,61 @@
+name: Publish the flasher
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  # Once a day, to pick up a firmware release made since the last deploy.
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ESP Web Tools fetches the firmware with fetch(), and GitHub release
+      # downloads send no CORS headers, so the binaries have to be served from
+      # the same Pages site as the page.
+      - name: Fetch the latest firmware release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo cateim/Tasmota --json tagName --jq .tagName)
+          mkdir -p site/firmware
+          gh release download "$tag" --repo cateim/Tasmota \
+            --pattern 'tasmota32s3-ag8.factory.bin' \
+            --pattern 'tasmota32s3-a16v3.factory.bin' \
+            --dir site/firmware
+          echo "FIRMWARE_TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Stamp the release into the manifests
+        run: |
+          for manifest in site/manifests/*.json; do
+            jq --arg v "$FIRMWARE_TAG" '.version = $v' "$manifest" > "$manifest.tmp"
+            mv "$manifest.tmp" "$manifest"
+          done
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

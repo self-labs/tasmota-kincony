@@ -1,0 +1,29 @@
+# tasmota-kincony - files that never enter the repository
+
+# ---- Firmware ----
+# The binaries come from the latest release of cateim/Tasmota, fetched by the
+# Pages workflow at deploy time. A copy here would go stale on the next build.
+site/firmware/
+*.bin
+
+# ---- Environment ----
+.env
+.env.*
+!.env.example
+
+# ---- Logs ----
+*.log
+
+# ---- Generated and regenerable ----
+graphify-out/
+
+# ---- Controle de trabalho ----
+# Rascunho de trabalho, nao documentacao: muda a cada sessao e cita o que
+# ainda esta quebrado.
+CHECKLIST.md
+
+# ---- OS and editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tasmota for KinCony</title>
+    <meta
+      name="description"
+      content="Flash Tasmota builds for KinCony boards straight from the browser."
+    />
+    <!-- Pinned. The hash covers this entry file; the two chunks it imports load
+         from the same pinned version. Upgrading means a new version and hash. -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/esp-web-tools@10.4.0/dist/web/install-button.js"
+      integrity="sha384-9XfyvAabgkISlB/Xb3OpshGKpZx0TOt5Mmu78SeiNU3so/p4o2s9m66vy6Utdnom"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      :root {
+        --bg: #f6f7f9;
+        --card: #ffffff;
+        --text: #1d2330;
+        --muted: #5b6475;
+        --line: #dfe3ea;
+        --accent: #1fa3ec;
+        --warn-bg: #fff4e5;
+        --warn-line: #f0b35a;
+        --code-bg: #eef1f5;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111418;
+          --card: #1a1f26;
+          --text: #e8ebf0;
+          --muted: #9aa3b2;
+          --line: #2b323c;
+          --accent: #4bb8f2;
+          --warn-bg: #2b2215;
+          --warn-line: #b7853a;
+          --code-bg: #232a33;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 32px 16px 48px;
+      }
+      h1 {
+        font-size: 1.9rem;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 0 0 4px;
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 20px 0 6px;
+      }
+      p {
+        margin: 8px 0;
+      }
+      .lead {
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+      .box {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 16px 0;
+      }
+      .warn {
+        background: var(--warn-bg);
+        border-color: var(--warn-line);
+      }
+      .board-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .tag {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      ol,
+      ul {
+        padding-left: 22px;
+        margin: 8px 0;
+      }
+      li {
+        margin: 4px 0;
+      }
+      code {
+        background: var(--code-bg);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.92em;
+      }
+      .copy {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+        margin: 8px 0;
+      }
+      .copy pre {
+        flex: 1;
+        margin: 0;
+        overflow-x: auto;
+        background: var(--code-bg);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+      button.copy-btn {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 0 14px;
+        cursor: pointer;
+        font: inherit;
+      }
+      a {
+        color: var(--accent);
+      }
+      esp-web-install-button button[slot="activate"] {
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      footer {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Tasmota for KinCony</h1>
+      <p class="lead">
+        Flash the Tasmota builds made for KinCony boards straight from the
+        browser. The official Tasmota binaries do not fit these boards: the AG8
+        needs the full IR driver with Ethernet, and the A16 v3 needs the PCF8574
+        driver that every official build leaves out.
+      </p>
+
+      <div class="box">
+        <h2>Before you start</h2>
+        <ul>
+          <li>
+            <strong>Chrome or Edge on a desktop computer.</strong> Flashing uses
+            Web Serial, which Firefox, Safari, Android and iOS do not have.
+          </li>
+          <li>A USB-C cable that carries data, not only power.</li>
+          <li>
+            If the board is not found, put it in download mode: hold
+            <strong>DW</strong>, tap <strong>RST</strong>, release
+            <strong>DW</strong>, and try again.
+          </li>
+        </ul>
+      </div>
+
+      <div class="box warn">
+        <h2>Back up the factory firmware first</h2>
+        <p>
+          Installing <strong>erases the whole flash</strong>, including the
+          KinCony KCS firmware and everything learned in it. The browser cannot
+          read the flash back, so take the backup with
+          <a href="https://docs.espressif.com/projects/esptool/">esptool</a>
+          before anything else:
+        </p>
+        <div class="copy">
+          <pre id="backup">python -m esptool --chip esp32s3 --port COM3 --baud 460800 read_flash 0x0 0x1000000 backup-16MB.bin</pre>
+          <button class="copy-btn" data-copy="backup">Copy</button>
+        </div>
+        <p>
+          The file must be exactly 16,777,216 bytes. Writing it back with
+          <code>write_flash 0x0 backup-16MB.bin</code> restores the board as it
+          came.
+        </p>
+      </div>
+
+      <div class="box">
+        <div class="board-head">
+          <div>
+            <h2>KinCony AG8</h2>
+            <div class="tag">
+              ESP32-S3, 8 IR emitters, IR receiver, W5500 Ethernet, RS485, RS232
+            </div>
+          </div>
+          <esp-web-install-button manifest="manifests/ag8.json">
+            <button slot="activate">Install on AG8</button>
+            <span slot="unsupported">
+              This browser cannot flash. Use Chrome or Edge on a desktop.
+            </span>
+            <span slot="not-allowed">
+              Web Serial needs HTTPS or localhost.
+            </span>
+          </esp-web-install-button>
+        </div>
+        <p>
+          Tasmota with the full IR driver, so every one of the 8 emitters can be
+          chosen per command, air conditioner protocols included, plus Ethernet,
+          the serial, Modbus and TCP bridges, MAX31865 and 1-Wire. Tested on the
+          board, Ethernet included with no USB cable plugged in.
+        </p>
+        <h3>After flashing</h3>
+        <ol>
+          <li>
+            Set up Wi-Fi when the installer offers it, or join the
+            <code>tasmota-XXXX</code> access point and open
+            <code>http://192.168.4.1</code>.
+          </li>
+          <li>
+            In the <strong>Console</strong>, send the template, then
+            <code>Module 0</code> as a separate command:
+          </li>
+        </ol>
+        <div class="copy">
+          <pre id="ag8-template">Template {"NAME":"KinCony AG8","GPIO":[0,5536,5600,0,0,0,0,0,0,1056,1057,1058,1059,1060,1061,0,0,0,0,0,0,1062,0,0,0,0,0,0,0,0,5568,736,704,672,0,0,1063,1088],"FLAG":0,"BASE":1}</pre>
+          <button class="copy-btn" data-copy="ag8-template">Copy</button>
+        </div>
+        <ol start="3">
+          <li>
+            Then <code>EthType 8</code> for the W5500 and
+            <code>SetOption58 1</code>, so remotes of unknown protocols can be
+            learned.
+          </li>
+          <li>
+            For Home Assistant, add the
+            <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>
+            integration from HACS.
+          </li>
+        </ol>
+        <p>
+          Full guide, in Portuguese:
+          <a
+            href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-ag8.md"
+            >KinCony AG8 no Home Assistant</a
+          >.
+        </p>
+      </div>
+
+      <div class="box">
+        <div class="board-head">
+          <div>
+            <h2>KinCony KC868-A16 v3</h2>
+            <div class="tag">
+              ESP32-S3, 16 relays, 16 inputs, 4 analog inputs, W5500 Ethernet,
+              RS485, RF 433 MHz, RTC, display
+            </div>
+          </div>
+          <esp-web-install-button manifest="manifests/a16v3.json">
+            <button slot="activate">Install on A16 v3</button>
+            <span slot="unsupported">
+              This browser cannot flash. Use Chrome or Edge on a desktop.
+            </span>
+            <span slot="not-allowed">
+              Web Serial needs HTTPS or localhost.
+            </span>
+          </esp-web-install-button>
+        </div>
+        <p>
+          Tasmota with the PCF8574 driver for the 32 channels, the DS3231 clock,
+          the SSD1306 display, the TCP bridge and RF 433 MHz.
+          <strong>Not flashed on a board yet</strong>: the binary has been
+          checked for every driver, but nothing has been tested on hardware.
+        </p>
+        <h3>After flashing</h3>
+        <ol>
+          <li>
+            Set up Wi-Fi when the installer offers it, or join the
+            <code>tasmota-XXXX</code> access point and open
+            <code>http://192.168.4.1</code>.
+          </li>
+          <li>
+            In the <strong>Console</strong>, send the template, then
+            <code>Module 0</code> as a separate command:
+          </li>
+        </ol>
+        <div class="copy">
+          <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,0,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
+          <button class="copy-btn" data-copy="a16-template">Copy</button>
+        </div>
+        <ol start="3">
+          <li>Then <code>EthType 8</code> for the W5500.</li>
+          <li>
+            Upload
+            <a
+              href="https://raw.githubusercontent.com/self-labs/homeassistant/master/assets/configs/tasmota/a16v3/pcf8574.dat"
+              download
+              ><code>pcf8574.dat</code></a
+            >
+            and
+            <a
+              href="https://raw.githubusercontent.com/self-labs/homeassistant/master/assets/configs/tasmota/a16v3/display.ini"
+              download
+              ><code>display.ini</code></a
+            >
+            under <strong>Consoles → Manage File System</strong>, and restart.
+          </li>
+          <li>
+            <code>SetOption114 1</code>, or closing input 1 switches relay 1.
+          </li>
+        </ol>
+        <p>
+          Full guide, in Portuguese:
+          <a
+            href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-a16v3.md"
+            >KinCony KC868-A16 v3 no Home Assistant</a
+          >.
+        </p>
+      </div>
+
+      <footer>
+        <p>
+          Firmware <span id="version">version unknown</span>, built from
+          <a href="https://github.com/cateim/Tasmota/tree/tasmota-kincony"
+            >cateim/Tasmota</a
+          >, branch <code>tasmota-kincony</code>. Tasmota is GPL-3.0, and that
+          branch is the source of these binaries. This page is MIT,
+          <a href="https://github.com/self-labs/tasmota-kincony"
+            >self-labs/tasmota-kincony</a
+          >. Not affiliated with KinCony or the Tasmota project.
+        </p>
+      </footer>
+    </main>
+    <script>
+      document.querySelectorAll("button.copy-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const text = document.getElementById(button.dataset.copy).textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+            button.textContent = "Copied";
+          } catch {
+            button.textContent = "Select and copy";
+          }
+          setTimeout(() => (button.textContent = "Copy"), 2000);
+        });
+      });
+      fetch("manifests/ag8.json")
+        .then((response) => response.json())
+        .then((manifest) => {
+          if (manifest.version) {
+            document.getElementById("version").textContent = manifest.version;
+          }
+        })
+        .catch(() => {});
+    </script>
+  </body>
+</html>
