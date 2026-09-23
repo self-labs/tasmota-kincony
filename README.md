@@ -35,9 +35,13 @@ is plugged in.
 
 - **Chrome or Edge on a desktop.** Flashing uses Web Serial, which Firefox,
   Safari, Android and iOS do not have.
-- **Back up the factory firmware.** Installing erases the whole flash, and the
-  browser cannot read it back. Take the 16 MB backup with esptool first; the
-  page has the exact command.
+- **Back up the board.** Installing erases the whole flash, and the browser
+  cannot read it back. The KCS firmware itself is published per board on the
+  [KinCony forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), and
+  the file inside the zip is a complete image that goes back at offset 0, so a
+  board is never stranded. What no download brings back is what the board held:
+  the settings, the scenes and the IR codes learned into the KCS slots. Take
+  the 16 MB backup with esptool first; the page has the exact command.
 - If the board is not found, put it in download mode: hold **DW**, tap
   **RST**, release **DW**.
 
