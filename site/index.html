@@ -6,7 +6,7 @@
     <title>Tasmota for KinCony</title>
     <meta
       name="description"
-      content="Flash Tasmota builds for KinCony boards straight from the browser."
+      content="Web flash Tasmota onto KinCony boards, straight from the browser."
     />
     <!-- Pinned. The hash covers this entry file; the two chunks it imports load
          from the same pinned version. Upgrading means a new version and hash. -->
@@ -17,175 +17,251 @@
       crossorigin="anonymous"
     ></script>
     <style>
+      /* Tasmota blue, and a page that stays out of the way around it. */
       :root {
-        --bg: #f6f7f9;
+        --blue: #1fa3ec;
+        --blue-dark: #0d83c7;
+        --bg: #f4f7fa;
+        --bg-soft: #e9eff6;
         --card: #ffffff;
-        --text: #1d2330;
-        --muted: #5b6475;
-        --line: #dfe3ea;
-        --accent: #1fa3ec;
-        --warn-bg: #fff4e5;
-        --warn-line: #f0b35a;
-        --code-bg: #eef1f5;
+        --text: #16202b;
+        --muted: #5a6876;
+        --line: #d9e2ec;
+        --code-bg: #eef3f8;
+        --warn-bg: #fff6e8;
+        --warn-line: #e8a33d;
+        --shadow: 0 1px 2px rgba(22, 32, 43, 0.06), 0 8px 24px rgba(22, 32, 43, 0.07);
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg: #111418;
-          --card: #1a1f26;
-          --text: #e8ebf0;
-          --muted: #9aa3b2;
-          --line: #2b323c;
-          --accent: #4bb8f2;
-          --warn-bg: #2b2215;
-          --warn-line: #b7853a;
-          --code-bg: #232a33;
+          --blue: #35b3f5;
+          --blue-dark: #1fa3ec;
+          --bg: #0e1319;
+          --bg-soft: #131a22;
+          --card: #172029;
+          --text: #e7edf3;
+          --muted: #9aabba;
+          --line: #253240;
+          --code-bg: #1d2731;
+          --warn-bg: #2a2114;
+          --warn-line: #a9792f;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
         }
       }
       * {
         box-sizing: border-box;
       }
+      html {
+        scroll-behavior: smooth;
+      }
       body {
         margin: 0;
         background: var(--bg);
         color: var(--text);
-        font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      header {
+        background: linear-gradient(160deg, var(--blue) 0%, var(--blue-dark) 100%);
+        color: #fff;
+        padding: 56px 16px 64px;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.9rem, 4vw, 2.6rem);
+        letter-spacing: -0.02em;
+      }
+      header p {
+        margin: 0 auto;
+        max-width: 620px;
+        font-size: 1.05rem;
+        opacity: 0.95;
       }
       main {
         max-width: 880px;
-        margin: 0 auto;
-        padding: 32px 16px 48px;
+        margin: -36px auto 56px;
+        padding: 0 16px;
       }
-      h1 {
-        font-size: 1.9rem;
-        margin: 0 0 4px;
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 0 0 20px;
+        box-shadow: var(--shadow);
+      }
+      .card.warn {
+        background: var(--warn-bg);
+        border-color: var(--warn-line);
+        box-shadow: none;
+      }
+      .card.plain {
+        background: var(--bg-soft);
+        box-shadow: none;
       }
       h2 {
-        font-size: 1.3rem;
-        margin: 0 0 4px;
+        font-size: 1.35rem;
+        margin: 0 0 6px;
+        letter-spacing: -0.01em;
       }
       h3 {
         font-size: 1rem;
-        margin: 20px 0 6px;
+        margin: 22px 0 6px;
       }
       p {
-        margin: 8px 0;
+        margin: 10px 0;
       }
-      .lead {
+      .muted {
         color: var(--muted);
-        margin-bottom: 24px;
-      }
-      .box {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 16px 0;
-      }
-      .warn {
-        background: var(--warn-bg);
-        border-color: var(--warn-line);
       }
       .board-head {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 16px;
+        margin-bottom: 4px;
       }
-      .tag {
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 10px 0 4px;
+      }
+      .chip {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 999px;
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+        padding: 2px 10px;
+      }
+      .chip.on {
+        background: color-mix(in srgb, var(--blue) 14%, transparent);
+        border-color: color-mix(in srgb, var(--blue) 35%, transparent);
+        color: var(--blue-dark);
       }
       ol,
       ul {
         padding-left: 22px;
-        margin: 8px 0;
+        margin: 10px 0;
       }
       li {
-        margin: 4px 0;
+        margin: 6px 0;
       }
       code {
         background: var(--code-bg);
-        border-radius: 4px;
-        padding: 1px 5px;
-        font-size: 0.92em;
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-size: 0.9em;
       }
       .copy {
         display: flex;
         gap: 8px;
         align-items: stretch;
-        margin: 8px 0;
+        margin: 10px 0;
       }
       .copy pre {
         flex: 1;
         margin: 0;
         overflow-x: auto;
         background: var(--code-bg);
-        border-radius: 8px;
-        padding: 10px 12px;
-        font-size: 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.83rem;
       }
       button.copy-btn {
         border: 1px solid var(--line);
         background: var(--card);
-        color: var(--text);
-        border-radius: 8px;
-        padding: 0 14px;
+        color: var(--muted);
+        border-radius: 10px;
+        padding: 0 16px;
         cursor: pointer;
         font: inherit;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+      button.copy-btn:hover {
+        border-color: var(--blue);
+        color: var(--blue-dark);
       }
       a {
-        color: var(--accent);
+        color: var(--blue-dark);
       }
       esp-web-install-button button[slot="activate"] {
-        background: var(--accent);
+        background: var(--blue);
         color: #fff;
         border: 0;
-        border-radius: 8px;
-        padding: 10px 18px;
+        border-radius: 10px;
+        padding: 12px 22px;
         font: inherit;
         font-weight: 600;
         cursor: pointer;
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--blue) 40%, transparent);
+      }
+      esp-web-install-button button[slot="activate"]:hover {
+        background: var(--blue-dark);
+      }
+      esp-web-install-button span[slot] {
+        color: var(--muted);
+        font-size: 0.9rem;
       }
       footer {
         color: var(--muted);
-        font-size: 0.9rem;
-        margin-top: 32px;
+        font-size: 0.88rem;
+        text-align: center;
+        padding: 0 16px 48px;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+      footer .version {
+        display: inline-block;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 12px;
+        margin-bottom: 10px;
+        color: var(--text);
+        font-size: 0.82rem;
       }
     </style>
   </head>
   <body>
-    <main>
+    <header>
       <h1>Tasmota for KinCony</h1>
-      <p class="lead">
-        Flash the Tasmota builds made for KinCony boards straight from the
-        browser. The official Tasmota binaries do not fit these boards: the AG8
-        needs the full IR driver with Ethernet, and the A16 v3 needs the PCF8574
-        driver that every official build leaves out.
+      <p>
+        Web flash the Tasmota builds made for KinCony boards: plug the board in
+        by USB-C, click install, and the browser does the rest. No Python, no
+        esptool, no PlatformIO.
       </p>
+    </header>
 
-      <div class="box">
+    <main>
+      <div class="card plain">
         <h2>Before you start</h2>
         <ul>
           <li>
-            <strong>Chrome or Edge on a desktop computer.</strong> Flashing uses
-            Web Serial, which Firefox, Safari, Android and iOS do not have.
+            <strong>Chrome or Edge on a desktop computer.</strong> Web flashing
+            uses Web Serial, which Firefox, Safari, Android and iOS do not have.
           </li>
           <li>A USB-C cable that carries data, not only power.</li>
           <li>
-            If the board is not found, put it in download mode: hold
-            <strong>DW</strong>, tap <strong>RST</strong>, release
-            <strong>DW</strong>, and try again.
+            Board not found? Put it in download mode: hold <strong>DW</strong>,
+            tap <strong>RST</strong>, release <strong>DW</strong>, and retry.
           </li>
         </ul>
       </div>
 
-      <div class="box warn">
+      <div class="card warn">
         <h2>Back up the factory firmware first</h2>
         <p>
-          Installing <strong>erases the whole flash</strong>, including the
-          KinCony KCS firmware and everything learned in it. The browser cannot
-          read the flash back, so take the backup with
+          Installing writes the <strong>factory image</strong>: bootloader,
+          partition table, application and safeboot, at offset 0, with the whole
+          flash erased first. That is what makes a board coming from the
+          KinCony KCS firmware boot clean, and it is also what removes KCS and
+          everything learned in it. A browser cannot read the flash back, so
+          take the backup with
           <a href="https://docs.espressif.com/projects/esptool/">esptool</a>
           before anything else:
         </p>
@@ -193,36 +269,42 @@
           <pre id="backup">python -m esptool --chip esp32s3 --port COM3 --baud 460800 read_flash 0x0 0x1000000 backup-16MB.bin</pre>
           <button class="copy-btn" data-copy="backup">Copy</button>
         </div>
-        <p>
+        <p class="muted">
           The file must be exactly 16,777,216 bytes. Writing it back with
           <code>write_flash 0x0 backup-16MB.bin</code> restores the board as it
           came.
         </p>
       </div>
 
-      <div class="box">
+      <div class="card">
         <div class="board-head">
           <div>
             <h2>KinCony AG8</h2>
-            <div class="tag">
-              ESP32-S3, 8 IR emitters, IR receiver, W5500 Ethernet, RS485, RS232
-            </div>
+            <div class="muted">Infrared controller, ESP32-S3</div>
           </div>
           <esp-web-install-button manifest="manifests/ag8.json">
             <button slot="activate">Install on AG8</button>
             <span slot="unsupported">
               This browser cannot flash. Use Chrome or Edge on a desktop.
             </span>
-            <span slot="not-allowed">
-              Web Serial needs HTTPS or localhost.
-            </span>
+            <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
           </esp-web-install-button>
         </div>
+        <div class="chips">
+          <span class="chip on">8 IR emitters</span>
+          <span class="chip on">IR receiver</span>
+          <span class="chip on">air conditioner protocols</span>
+          <span class="chip on">W5500 Ethernet</span>
+          <span class="chip">RS485 and RS232</span>
+          <span class="chip">Modbus and TCP bridge</span>
+          <span class="chip">MAX31865</span>
+          <span class="chip">1-Wire</span>
+        </div>
         <p>
-          Tasmota with the full IR driver, so every one of the 8 emitters can be
-          chosen per command, air conditioner protocols included, plus Ethernet,
-          the serial, Modbus and TCP bridges, MAX31865 and 1-Wire. Tested on the
-          board, Ethernet included with no USB cable plugged in.
+          The full IR driver, so a command can pick which of the 8 emitters it
+          leaves through, next to everything the standard ESP32-S3 build has.
+          Running here since September 2026, Ethernet included with no USB cable
+          plugged in.
         </p>
         <h3>After flashing</h3>
         <ol>
@@ -232,7 +314,7 @@
             <code>http://192.168.4.1</code>.
           </li>
           <li>
-            In the <strong>Console</strong>, send the template, then
+            In the <strong>Console</strong>, paste the template, then send
             <code>Module 0</code> as a separate command:
           </li>
         </ol>
@@ -242,17 +324,17 @@
         </div>
         <ol start="3">
           <li>
-            Then <code>EthType 8</code> for the W5500 and
-            <code>SetOption58 1</code>, so remotes of unknown protocols can be
-            learned.
+            <code>EthType 8</code> for the W5500, and <code>SetOption58 1</code>
+            so remotes of unknown protocols can be learned.
           </li>
           <li>
-            For Home Assistant, add the
+            For Home Assistant, add
             <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>
-            integration from HACS.
+            from HACS: every key you learn becomes a button, and every air
+            conditioner a climate entity.
           </li>
         </ol>
-        <p>
+        <p class="muted">
           Full guide, in Portuguese:
           <a
             href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-ag8.md"
@@ -261,30 +343,35 @@
         </p>
       </div>
 
-      <div class="box">
+      <div class="card">
         <div class="board-head">
           <div>
             <h2>KinCony KC868-A16 v3</h2>
-            <div class="tag">
-              ESP32-S3, 16 relays, 16 inputs, 4 analog inputs, W5500 Ethernet,
-              RS485, RF 433 MHz, RTC, display
-            </div>
+            <div class="muted">16 relays, ESP32-S3</div>
           </div>
           <esp-web-install-button manifest="manifests/a16v3.json">
             <button slot="activate">Install on A16 v3</button>
             <span slot="unsupported">
               This browser cannot flash. Use Chrome or Edge on a desktop.
             </span>
-            <span slot="not-allowed">
-              Web Serial needs HTTPS or localhost.
-            </span>
+            <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
           </esp-web-install-button>
         </div>
+        <div class="chips">
+          <span class="chip on">16 relays</span>
+          <span class="chip on">16 inputs</span>
+          <span class="chip on">4 analog inputs</span>
+          <span class="chip on">W5500 Ethernet</span>
+          <span class="chip">RF 433 MHz</span>
+          <span class="chip">DS3231 clock</span>
+          <span class="chip">SSD1306 display</span>
+          <span class="chip">RS485</span>
+        </div>
         <p>
-          Tasmota with the PCF8574 driver for the 32 channels, the DS3231 clock,
-          the SSD1306 display, the TCP bridge and RF 433 MHz.
-          <strong>Not flashed on a board yet</strong>: the binary has been
-          checked for every driver, but nothing has been tested on hardware.
+          The PCF8574 driver for the 32 channels, which no official build has,
+          plus the clock, the display and the TCP bridge.
+          <strong>Not flashed on a board yet:</strong> the binary has been
+          checked driver by driver, and nothing more.
         </p>
         <h3>After flashing</h3>
         <ol>
@@ -294,7 +381,7 @@
             <code>http://192.168.4.1</code>.
           </li>
           <li>
-            In the <strong>Console</strong>, send the template, then
+            In the <strong>Console</strong>, paste the template, then send
             <code>Module 0</code> as a separate command:
           </li>
         </ol>
@@ -303,7 +390,7 @@
           <button class="copy-btn" data-copy="a16-template">Copy</button>
         </div>
         <ol start="3">
-          <li>Then <code>EthType 8</code> for the W5500.</li>
+          <li><code>EthType 8</code> for the W5500.</li>
           <li>
             Upload
             <a
@@ -323,7 +410,7 @@
             <code>SetOption114 1</code>, or closing input 1 switches relay 1.
           </li>
         </ol>
-        <p>
+        <p class="muted">
           Full guide, in Portuguese:
           <a
             href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-a16v3.md"
@@ -332,19 +419,41 @@
         </p>
       </div>
 
-      <footer>
+      <div class="card plain">
+        <h2>Where the firmware comes from</h2>
         <p>
-          Firmware <span id="version">version unknown</span>, built from
+          Both builds come from
           <a href="https://github.com/cateim/Tasmota/tree/tasmota-kincony"
             >cateim/Tasmota</a
-          >, branch <code>tasmota-kincony</code>. Tasmota is GPL-3.0, and that
-          branch is the source of these binaries. This page is MIT,
-          <a href="https://github.com/self-labs/tasmota-kincony"
-            >self-labs/tasmota-kincony</a
-          >. Not affiliated with KinCony or the Tasmota project.
+          >, branch <code>tasmota-kincony</code>, which is Tasmota plus the two
+          environments these boards need. Every push there builds both boards
+          and publishes a release, and this page serves the binaries of the
+          latest one.
         </p>
-      </footer>
+        <p>
+          <strong>Updating to a newer Tasmota</strong> is merging the upstream
+          release into that branch and pushing: the build runs, a release comes
+          out, and the site picks it up within a day, or straight away from its
+          Actions tab. The install button always writes the whole factory
+          image, so a board flashed from here is always on the release shown
+          below.
+        </p>
+      </div>
     </main>
+
+    <footer>
+      <div class="version" id="version">firmware version unknown</div>
+      <p>
+        Tasmota is GPL-3.0, and the branch above is the complete source of these
+        binaries. This page is MIT,
+        <a href="https://github.com/self-labs/tasmota-kincony"
+          >self-labs/tasmota-kincony</a
+        >. Built with
+        <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools</a>.
+        Not affiliated with KinCony or with the Tasmota project.
+      </p>
+    </footer>
+
     <script>
       document.querySelectorAll("button.copy-btn").forEach((button) => {
         button.addEventListener("click", async () => {
@@ -362,7 +471,8 @@
         .then((response) => response.json())
         .then((manifest) => {
           if (manifest.version) {
-            document.getElementById("version").textContent = manifest.version;
+            document.getElementById("version").textContent =
+              "firmware " + manifest.version;
           }
         })
         .catch(() => {});

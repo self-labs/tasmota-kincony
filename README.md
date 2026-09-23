@@ -58,6 +58,37 @@ fetches them from the browser and GitHub release downloads send no CORS
 headers. The site redeploys on every push here, once a day, and on demand from
 the **Actions** tab.
 
+## Updating to a newer Tasmota
+
+The firmware is Tasmota itself plus the two environments these boards need, on
+the `tasmota-kincony` branch of `cateim/Tasmota`. Updating is merging upstream
+into it:
+
+```bash
+git remote add upstream https://github.com/arendst/Tasmota.git   # once
+git fetch upstream --tags
+git checkout tasmota-kincony
+git merge v15.7.0          # or whichever release you are moving to
+git push origin tasmota-kincony
+```
+
+The push builds both boards, publishes `kincony-YYYYMMDD-<sha>` and marks it as
+the latest release. This site picks that up on its next run, which is daily, on
+any push here, or on demand from the **Actions** tab. The version served is the
+one printed at the bottom of the page.
+
+Only two files carry the house changes: `platformio_tasmota_cenv.ini`, with the
+two environments, and the workflow that builds and releases them. A merge
+conflict in either is the only thing an upstream release can break.
+
+**The install button always writes the factory image**, at offset 0, with the
+flash erased first: bootloader, partition table, application and safeboot. A
+board flashed from the site is therefore always on the release shown there,
+whatever it was running before. Updating a board that already runs one of these
+builds does not need the site at all: upload the plain `.bin` of the release
+under **Firmware Upgrade** in the board's own web interface, and the settings
+survive.
+
 ## Setting the board up after flashing
 
 The page lists the commands for each board: the GPIO template, `EthType 8`,
