@@ -131,8 +131,9 @@ turning off right after the first flash:
 Tasmota also ships set to UTC+1 (`APP_TIMEZONE 1`); set `Timezone` to your own
 offset.
 
-The page lists the commands for each board: the GPIO template, `EthType 8`,
-and the board specific ones.
+The page lists the commands for each board, one copyable block per step, all
+typed in **Tools → Console**: the GPIO template, `Module 0`, `EthType 8`, and
+the board specific ones.
 
 The A16v3 also needs two files on its own filesystem, served from
 [`site/files/`](./site/files/) and linked from the page:

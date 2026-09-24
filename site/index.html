@@ -486,6 +486,32 @@
       details.steps li {
         margin: 8px 0;
       }
+      details.steps > ol > li {
+        margin: 14px 0;
+      }
+      details.steps .where {
+        margin: 12px 0 0;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      details.steps ul.why {
+        padding-left: 18px;
+        margin: 6px 0 0;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      details.steps ul.why li {
+        margin: 4px 0;
+      }
+      /* The whole command stays in view, on a phone too, instead of hiding
+         behind a sideways scroll. Copy still takes the exact text. */
+      details.steps .code pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      details.steps code {
+        white-space: nowrap;
+      }
 
       /* ---------- code ---------- */
       .code {
@@ -508,7 +534,10 @@
         position: absolute;
         top: 9px;
         right: 9px;
-        background: rgba(255, 255, 255, 0.12);
+        /* Opaque, and a shadow in the code colour, so a long line that
+           scrolls under the button does not show through it. */
+        background: color-mix(in srgb, var(--code) 82%, #fff);
+        box-shadow: -14px 0 10px var(--code);
         color: #fff;
         border: 1px solid rgba(255, 255, 255, 0.22);
         border-radius: 8px;
@@ -518,7 +547,7 @@
         cursor: pointer;
       }
       .code button:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: color-mix(in srgb, var(--code) 72%, #fff);
       }
 
       /* ---------- callout ---------- */
@@ -851,31 +880,71 @@
                 <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary>After flashing, four commands</summary>
+                <summary>After flashing, six steps</summary>
+                <p class="where">
+                  Every command below goes in the board's own page:
+                  <strong>Tools → Console</strong>. Paste it, press Enter.
+                </p>
                 <ol>
                   <li>
-                    Set Wi-Fi up when the installer offers it, or join the
-                    <code>tasmota-XXXX</code> access point at
-                    <code>http://192.168.4.1</code>.
-                  </li>
-                  <li>Paste the template in the <strong>Console</strong>, then send <code>Module 0</code> on its own:</li>
-                </ol>
-                <div class="code">
-                  <pre id="ag8-template">Template {"NAME":"KinCony AG8","GPIO":[0,5536,5600,0,0,0,0,0,0,1056,1057,1058,1059,1060,1061,0,0,0,0,0,0,1062,0,0,0,0,0,0,0,0,5568,736,704,672,0,0,1063,1088],"FLAG":0,"BASE":1}</pre>
-                  <button class="copy-btn" data-copy="ag8-template">Copy</button>
-                </div>
-                <ol start="3">
-                  <li><code>EthType 8</code> for the Ethernet, and <code>SetOption58 1</code> so unknown protocols can be learned.</li>
-                  <li>
-                    <code>Backlog SetOption65 1; SetOption36 0; Timezone -3</code>.
-                    The first two keep the board from wiping itself: seven quick
-                    power cycles erase every setting, and five or six quick
-                    restarts clear the template and the module. Tasmota ships
-                    set to UTC+1; use your own offset (<code>-3</code> is
-                    Brazil).
+                    <strong>Wi-Fi.</strong> Right after flashing, the installer
+                    asks for your network: fill it in and you are done here.
+                    <ul class="why">
+                      <li>
+                        Skipped that screen? With no Wi-Fi saved, the board
+                        opens a network of its own, <code>tasmota-XXXX</code>.
+                        Join it from a phone or a laptop, open
+                        <code>http://192.168.4.1</code> and enter your Wi-Fi
+                        there.
+                      </li>
+                    </ul>
                   </li>
                   <li>
-                    In Home Assistant, add
+                    <strong>Template.</strong> Send this first, then
+                    <code>Module 0</code> as a second command. The board
+                    restarts after <code>Module 0</code>.
+                    <div class="code">
+                      <pre id="ag8-template">Template {"NAME":"KinCony AG8","GPIO":[0,5536,5600,0,0,0,0,0,0,1056,1057,1058,1059,1060,1061,0,0,0,0,0,0,1062,0,0,0,0,0,0,0,0,5568,736,704,672,0,0,1063,1088],"FLAG":0,"BASE":1}</pre>
+                      <button class="copy-btn" data-copy="ag8-template">Copy</button>
+                    </div>
+                    <div class="code">
+                      <pre id="ag8-module">Module 0</pre>
+                      <button class="copy-btn" data-copy="ag8-module">Copy</button>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Ethernet.</strong> <code>8</code> is the W5500 chip
+                    on this board. It restarts by itself, and after that the
+                    cable works without USB.
+                    <div class="code">
+                      <pre id="ag8-eth">EthType 8</pre>
+                      <button class="copy-btn" data-copy="ag8-eth">Copy</button>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Learning any remote.</strong> Without this, a remote
+                    whose protocol Tasmota does not know is ignored; with it,
+                    its raw timings come through and can be learned.
+                    <div class="code">
+                      <pre id="ag8-ir">SetOption58 1</pre>
+                      <button class="copy-btn" data-copy="ag8-ir">Copy</button>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Protection and clock.</strong> One line, three
+                    settings:
+                    <div class="code">
+                      <pre id="ag8-protect">Backlog SetOption65 1; SetOption36 0; Timezone -3</pre>
+                      <button class="copy-btn" data-copy="ag8-protect">Copy</button>
+                    </div>
+                    <ul class="why">
+                      <li><code>SetOption65 1</code>: seven quick power cycles no longer erase every setting.</li>
+                      <li><code>SetOption36 0</code>: five or six quick restarts no longer clear the template and the module.</li>
+                      <li><code>Timezone -3</code>: Brazil time. Tasmota ships at UTC+1; put your own offset instead of <code>-3</code>.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Home Assistant.</strong> Add
                     <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>
                     from HACS: learned keys become buttons, air conditioners become climate entities.
                   </li>
@@ -940,41 +1009,82 @@
                 <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary>After flashing, five steps</summary>
+                <summary>After flashing, six steps</summary>
+                <p class="where">
+                  Every command below goes in the board's own page:
+                  <strong>Tools → Console</strong>. Paste it, press Enter.
+                </p>
                 <ol>
                   <li>
-                    Set Wi-Fi up when the installer offers it, or join the
-                    <code>tasmota-XXXX</code> access point at
-                    <code>http://192.168.4.1</code>.
+                    <strong>Wi-Fi.</strong> Right after flashing, the installer
+                    asks for your network: fill it in and you are done here.
+                    <ul class="why">
+                      <li>
+                        Skipped that screen? With no Wi-Fi saved, the board
+                        opens a network of its own, <code>tasmota-XXXX</code>.
+                        Join it from a phone or a laptop, open
+                        <code>http://192.168.4.1</code> and enter your Wi-Fi
+                        there.
+                      </li>
+                    </ul>
                   </li>
-                  <li>Paste the template in the <strong>Console</strong>, then send <code>Module 0</code> on its own:</li>
-                </ol>
-                <div class="code">
-                  <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,0,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
-                  <button class="copy-btn" data-copy="a16-template">Copy</button>
-                </div>
-                <ol start="3">
-                  <li><code>EthType 8</code> for the Ethernet.</li>
                   <li>
-                    Upload
+                    <strong>Template.</strong> Send this first, then
+                    <code>Module 0</code> as a second command. The board
+                    restarts after <code>Module 0</code>.
+                    <div class="code">
+                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,0,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
+                      <button class="copy-btn" data-copy="a16-template">Copy</button>
+                    </div>
+                    <div class="code">
+                      <pre id="a16-module">Module 0</pre>
+                      <button class="copy-btn" data-copy="a16-module">Copy</button>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Ethernet.</strong> <code>8</code> is the W5500 chip
+                    on this board. It restarts by itself, and after that the
+                    cable works without USB.
+                    <div class="code">
+                      <pre id="a16-eth">EthType 8</pre>
+                      <button class="copy-btn" data-copy="a16-eth">Copy</button>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>The two files.</strong> Download
                     <a href="files/pcf8574.dat" download><code>pcf8574.dat</code></a>
                     and
-                    <a href="files/display.ini" download><code>display.ini</code></a>
-                    under <strong>Consoles → Manage File System</strong>, and restart.
+                    <a href="files/display.ini" download><code>display.ini</code></a>,
+                    upload both under <strong>Tools → Manage File system</strong>,
+                    then restart:
+                    <div class="code">
+                      <pre id="a16-restart">Restart 1</pre>
+                      <button class="copy-btn" data-copy="a16-restart">Copy</button>
+                    </div>
                   </li>
                   <li>
-                    <code>Backlog SetOption114 1; SwitchMode0 2</code>. The first
-                    keeps input 1 from switching relay 1. The second is what makes
-                    Home Assistant create the 16 inputs: in the default mode it
-                    only offers them as automation triggers.
+                    <strong>Inputs.</strong> One line, two settings:
+                    <div class="code">
+                      <pre id="a16-inputs">Backlog SetOption114 1; SwitchMode0 2</pre>
+                      <button class="copy-btn" data-copy="a16-inputs">Copy</button>
+                    </div>
+                    <ul class="why">
+                      <li><code>SetOption114 1</code>: the inputs stop switching the relays. Without it, closing input 1 flips relay 1.</li>
+                      <li><code>SwitchMode0 2</code>: all 16 inputs read on while the contact is closed. It is also what makes Home Assistant create them as sensors; in the default mode they only show up as automation triggers.</li>
+                    </ul>
                   </li>
                   <li>
-                    <code>Backlog SetOption65 1; SetOption36 0; Timezone -3</code>.
-                    The first two keep the board from wiping itself: seven quick
-                    power cycles erase every setting, and five or six quick
-                    restarts clear the template and the module. Tasmota ships
-                    set to UTC+1; use your own offset (<code>-3</code> is
-                    Brazil).
+                    <strong>Protection and clock.</strong> One line, three
+                    settings:
+                    <div class="code">
+                      <pre id="a16-protect">Backlog SetOption65 1; SetOption36 0; Timezone -3</pre>
+                      <button class="copy-btn" data-copy="a16-protect">Copy</button>
+                    </div>
+                    <ul class="why">
+                      <li><code>SetOption65 1</code>: seven quick power cycles no longer erase every setting.</li>
+                      <li><code>SetOption36 0</code>: five or six quick restarts no longer clear the template and the module.</li>
+                      <li><code>Timezone -3</code>: Brazil time. Tasmota ships at UTC+1; put your own offset instead of <code>-3</code>.</li>
+                    </ul>
                   </li>
                 </ol>
                 <p style="font-size: 0.88rem; color: var(--muted)">
