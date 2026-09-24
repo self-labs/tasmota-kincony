@@ -43,9 +43,9 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
   Tools means changing the version in the URL and recomputing the `sha384`
   of that exact file. The hash covers the entry file only; the chunks it
   imports load from the same pinned version.
-- **Say what is unverified.** The A16v3 build has been flashed and runs on a
-  board, and its relays and inputs are still being verified; the status line
-  and the FAQ say so. Keep both in step with what has been checked on hardware.
+- **Say what is unverified.** Both builds run on real boards, relays, inputs
+  and Ethernet checked. A board or a feature that has not been checked on
+  hardware gets an amber status line and says why.
 - **`improv_firmware` must equal what the board announces.** The page sets
   `checkSameFirmware` to compare the board's Improv name with that field. The
   board announces `Tasmota ` plus the `CODE_IMAGE_STR` of its build, so
@@ -59,8 +59,10 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
 - **The installer asks before erasing.** `new_install_prompt_erase` shows an
   "Erase device" box that starts unticked. Never write that the page always
   erases.
-- **No claim about what Update does to the settings until it is tested on a
-  board**, with the configuration backed up first. The images must carry the
+- **Update keeps the settings, and that was tested**, on the A16v3 with
+  `kincony-20260924-97ba55c`, the first release carrying the 16 MB table.
+  Any change to the partition table needs the same test again, with the
+  configuration backed up, before the page says so. The images must carry the
   16 MB partition table Tasmota creates on the first boot
   (`partitions/esp32_partition_app2880k_fs12608k.csv` in the fork): with the
   4 MB one, writing the image again shrinks the filesystem back and formats

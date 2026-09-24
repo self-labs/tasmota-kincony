@@ -29,7 +29,7 @@ is plugged in.
 | Board                | Build               | Status                                                     |
 | -------------------- | ------------------- | ---------------------------------------------------------- |
 | KinCony AG8          | `tasmota32s3-ag8`   | in use: 8 emitters, receiver, Ethernet without USB         |
-| KinCony KC868-A16v3  | `tasmota32s3-a16v3` | flashed in September 2026; relays and inputs being verified |
+| KinCony KC868-A16v3  | `tasmota32s3-a16v3` | in use: 16 relays, 16 inputs, Ethernet without USB              |
 
 ## Before you flash
 
@@ -94,8 +94,10 @@ the board.
   itself over Improv as `Tasmota AG8` or `Tasmota A16v3` (the `CODE_IMAGE_STR`
   of its build), each manifest names that string in `improv_firmware`, and the
   page hands ESP Web Tools a `checkSameFirmware` that compares the two, keeping
-  the descriptive `name`. The page offers **Update**, written without erasing.
-  Back the configuration up first (Configuration, Backup).
+  the descriptive `name`. The page offers **Update**, written without erasing,
+  and the settings are kept: tested on the A16v3 with
+  `kincony-20260924-97ba55c`. A configuration backup (Configuration, Backup)
+  first still costs nothing.
 - **The partition table matters.** On the first boot with fresh settings
   Tasmota grows the filesystem to the end of the flash and rewrites the table
   (`resize_fs_to_max`, run from `xdrv_52_7_berry_embedded.ino` when the boot
@@ -116,6 +118,19 @@ application and nothing else.
 
 ## Setting the board up after flashing
 
+Two Tasmota defaults can wipe these boards on their own, and both are worth
+turning off right after the first flash:
+
+- **`SetOption65 1`**: seven quick power cycles in a row erase every setting
+  (`QPC_COUNT = 7` in `settings.ino`). A board in an electrical panel sees that
+  in a bad afternoon.
+- **`SetOption36 0`**: the boot loop protection clears the GPIO template after
+  five quick restarts and resets the module after six (`tasmota.ino`). These
+  boards come back from it with no relays and no Ethernet.
+
+Tasmota also ships set to UTC+1 (`APP_TIMEZONE 1`); set `Timezone` to your own
+offset.
+
 The page lists the commands for each board: the GPIO template, `EthType 8`,
 and the board specific ones.
 
@@ -124,7 +139,11 @@ The A16v3 also needs two files on its own filesystem, served from
 
 - `pcf8574.dat` declares the 32 expander pins, 16 inputs as switches and 16
   relays inverted. Without it the expanders are detected and nothing is
-  switchable.
+  switchable. The inputs come with their halves swapped, as measured on the
+  board: the chip at `0x21` carries inputs 9 to 16, and `0x22` inputs 1 to 8.
+  For the inputs to show up in Home Assistant, the board also needs
+  `SwitchMode0 2`; in mode 0 the integration only creates automation
+  triggers.
 - `display.ini` describes the SSD1306 panel, which no longer has a build flag
   of its own.
 
