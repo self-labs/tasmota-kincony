@@ -25,6 +25,7 @@ The site has no version of its own: the firmware it serves is identified by the
 
 ### Fixed
 
+- **The page promised that Update keeps the settings, and it wipes them.** Confirmed on the A16v3, where the configuration survived only because it had been backed up: an Update from the page reset it, and so had an Install with "Erase device" unticked. The factory image carries a 4 MB partition table, Tasmota grows its filesystem to the whole 16 MB flash on the first boot and rewrites the table, and writing the image again puts the small table back, so the filesystem, where the settings live, is formatted; the image also blanks the NVS. The page, the README and the FAQ now say to update with the plain `.bin` under Firmware Upgrade, and recognising a board is switched off (`RECOGNISE_BOARDS`) until the builds carry the 16 MB table, since until then "Update" would only be a friendlier label on the same reset.
 - **The page said the installer always erases the flash.** ESP Web Tools asks, with the "Erase device" box unticked by default, and does not erase at all when it updates a board it recognises. The backup warning, the install steps, the update tile and the FAQ now say what actually happens.
 - **The A16v3 was still described as never flashed.** It was flashed from the page and runs on a board, with the expanders, the clock and the analog inputs detected at boot; the status line and the FAQ say that its relays and inputs are what is left to verify.
 - **The board name is KC868-A16v3**, with no space, everywhere on the page and in the documentation.

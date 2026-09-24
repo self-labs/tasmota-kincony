@@ -57,8 +57,15 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
   version, so the Tasmota version there would hide house-build fixes. The
   Tasmota version goes in `tasmota`, for the footer.
 - **The installer asks before erasing.** `new_install_prompt_erase` shows an
-  "Erase device" box that starts unticked, and a recognised board is updated
-  without erasing at all. Never write that the page always erases.
+  "Erase device" box that starts unticked. Never write that the page always
+  erases.
+- **Never write that flashing from the page keeps the settings.** It does not,
+  on these boards, erase or not: the factory image carries a 4 MB partition
+  table, Tasmota grows the filesystem to 16 MB on the first boot and rewrites
+  the table, and writing the image again formats the filesystem. Updating a
+  board means Firmware Upgrade with the plain `.bin`. `RECOGNISE_BOARDS` stays
+  `false` until the builds carry the 16 MB table, and turning it on needs a
+  test on a board with its configuration backed up.
 - **Never use em dashes or en dashes**, anywhere: page, README, commits.
 
 ## Commits

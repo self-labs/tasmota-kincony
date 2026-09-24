@@ -90,12 +90,22 @@ conflict in either is the only thing an upstream release can break.
 partition table, application and safeboot. What happens before that depends on
 the board.
 
-- **A board already running one of these builds** is recognised. It announces
-  itself over Improv as `Tasmota AG8` or `Tasmota A16v3` (the `CODE_IMAGE_STR`
-  of its build), each manifest names that string in `improv_firmware`, and the
-  page hands ESP Web Tools a `checkSameFirmware` that compares the two, so the
-  descriptive `name` of the manifest can stay. The page offers **Update**,
-  written without erasing, and the settings survive.
+- **Flashing from the page resets a board that already runs Tasmota**, with
+  "Erase device" ticked or not. The factory image carries a 4 MB partition
+  table (filesystem at `0x3B0000`, `0x50000`). On the first boot with fresh
+  settings Tasmota grows the filesystem to the end of the 16 MB flash and
+  rewrites the table (`resize_fs_to_max`, run from
+  `xdrv_52_7_berry_embedded.ino` when the boot count is 0). Writing the image
+  again puts the small table back, the filesystem no longer mounts and is
+  formatted, and the image also blanks the NVS, where Tasmota keeps its second
+  copy of the settings. Confirmed on the A16v3.
+- **Recognising a board is built and switched off.** A board announces itself
+  over Improv as `Tasmota AG8` or `Tasmota A16v3` (the `CODE_IMAGE_STR` of its
+  build), each manifest names that string in `improv_firmware`, and the page
+  can hand ESP Web Tools a `checkSameFirmware` that compares the two, keeping
+  the descriptive `name`. `RECOGNISE_BOARDS` in the page is `false` until the
+  builds carry the 16 MB table, because until then "Update" would only be a
+  friendlier label on the same reset.
 - **Why always Update.** ESP Web Tools skips the install when the version the
   board reports equals the manifest `version`, and a board reports the bare
   Tasmota version, the same for every house build of that Tasmota. So the
@@ -105,8 +115,9 @@ the board.
 - **Any other board** gets **Install**, and the installer first asks whether to
   erase the flash, with the box unticked. Coming from KCS, tick it.
 
-Uploading the plain `.bin` under **Firmware Upgrade** in the board's own web
-interface updates a board just as well, without the site.
+**To update a board that already runs one of these builds, use Firmware
+Upgrade in its own web interface** with the plain `.bin` of the release. It
+replaces the application and nothing else, so the settings survive.
 
 ## Setting the board up after flashing
 
