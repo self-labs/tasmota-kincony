@@ -6,7 +6,7 @@
     <title>Tasmota for KinCony</title>
     <meta
       name="description"
-      content="Web flash Tasmota onto KinCony boards from the browser: 8 infrared emitters on the AG8, 32 channels on the A16 v3, Ethernet on both."
+      content="Web flash Tasmota onto KinCony boards from the browser: 8 infrared emitters on the AG8, 32 channels on the A16v3, Ethernet on both."
     />
     <meta name="color-scheme" content="light dark" />
     <meta property="og:title" content="Tasmota for KinCony" />
@@ -768,7 +768,7 @@
             </div>
             <h3>The PCF8574 expanders</h3>
             <p>
-              The 16 relays and 16 inputs of the A16 v3 sit behind I2C
+              The 16 relays and 16 inputs of the A16v3 sit behind I2C
               expanders, and that driver is commented out in every official
               build. The board boots with nothing to switch.
             </p>
@@ -901,7 +901,7 @@
                 </g>
               </svg>
               <div style="padding-bottom: 20px">
-                <h3>KC868-A16 v3</h3>
+                <h3>KC868-A16v3</h3>
                 <div class="tagline">16 relays, ESP32-S3</div>
               </div>
             </div>
@@ -920,13 +920,13 @@
                 The PCF8574 driver for the 32 channels, which no official build
                 carries, next to the clock, the display and the bridges.
               </p>
-              <span class="status"><span class="dot warn"></span> Built and checked driver by driver, never flashed on a board</span>
+              <span class="status"><span class="dot warn"></span> Flashed here in September 2026; relays and inputs still being verified</span>
               <esp-web-install-button manifest="manifests/a16v3.json">
                 <button slot="activate">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                  Install on the A16 v3
+                  Install on the A16v3
                 </button>
                 <span slot="unsupported">Use Chrome or Edge on a desktop to flash.</span>
                 <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
@@ -975,11 +975,13 @@
           <div style="flex: 1">
             <h2>Back the board up first</h2>
             <p>
-              Installing writes the <strong>factory image</strong>, at offset 0,
-              with the whole flash erased first: bootloader, partition table,
-              application and safeboot. That is what makes a board coming from
-              the KinCony KCS firmware boot clean, and it is also what erases
-              KCS along with everything configured and learned inside it.
+              Installing writes the <strong>factory image</strong> at offset 0:
+              bootloader, partition table, application and safeboot. On a board
+              coming from another firmware the installer first asks whether to
+              erase the flash, and the box starts unticked.
+              <strong>Coming from KCS, tick it</strong>: that is what makes the
+              board boot clean, and it also erases KCS along with everything
+              configured and learned inside it.
             </p>
             <p>
               <strong>The KCS firmware itself is not lost.</strong> KinCony
@@ -1022,8 +1024,9 @@
           <div class="step">
             <h3>Click install</h3>
             <p>
-              The browser erases the flash and writes the factory image straight
-              from this page. Nothing is installed on your computer.
+              The browser writes the factory image straight from this page,
+              asking first whether to erase the flash. Nothing is installed on
+              your computer.
             </p>
           </div>
           <div class="step">
@@ -1061,9 +1064,12 @@
           <div class="tile">
             <h3>Updating a board</h3>
             <p>
-              A board that already runs one of these builds does not need this
-              page: upload the plain <code>.bin</code> of the release under
-              Firmware Upgrade, and the settings survive.
+              The page recognises a board that already runs one of these
+              builds, by the name it announces (<code>Tasmota AG8</code>,
+              <code>Tasmota A16v3</code>), and offers <strong>Update</strong>:
+              the new firmware goes in without erasing, and the settings
+              survive. Uploading the plain <code>.bin</code> under Firmware
+              Upgrade does the same from the board itself.
             </p>
           </div>
           <div class="tile">
@@ -1109,18 +1115,22 @@
           <details>
             <summary>Are my settings kept when I flash from here?</summary>
             <p>
-              No. This page always writes the factory image with the flash
-              erased, which is what a board coming from another firmware needs.
-              To keep settings, update by uploading the plain
-              <code>.bin</code> in the board's own Firmware Upgrade page.
+              It depends on what the board runs. One of these builds is
+              recognised and updated without erasing, so its settings survive.
+              Anything else, KCS included, gets a fresh install, and the
+              installer asks first whether to erase: ticked, the board starts
+              blank; unticked, leftovers of the previous firmware stay in the
+              flash, which is why erasing is the right choice coming from KCS.
             </p>
           </details>
           <details>
-            <summary>Why is the A16 v3 marked as untested?</summary>
+            <summary>Why is the A16v3 marked in amber?</summary>
             <p>
-              Because it is. The binary has been checked driver by driver, and
-              the board it was built for still runs the factory firmware. The
-              AG8 build, on the other hand, has been in daily use since
+              Because part of it is still being verified. It was flashed from
+              this page in September 2026 and runs on a board, with the four
+              expanders, the clock and the analog inputs detected at boot. Its
+              16 relays and 16 inputs are what is left to confirm on that board.
+              The AG8 build, on the other hand, has been in daily use since
               September 2026.
             </p>
           </details>
@@ -1173,22 +1183,38 @@
           setTimeout(() => (button.textContent = "Copy"), 2000);
         });
       });
+      // ESP Web Tools recognises a board as already running this firmware
+      // only when its Improv name equals manifest.name. The manifests keep a
+      // descriptive name for the dialog and say in "improv_firmware" what the
+      // board itself announces, "Tasmota " plus the CODE_IMAGE_STR of its
+      // build, so the comparison is handed that field instead. A recognised
+      // board is offered Update, written without erasing: the manifest
+      // version is the release tag, which never equals the bare Tasmota
+      // version a board reports, so a house-build fix is always offered.
+      customElements.whenDefined("esp-web-install-button").then(() => {
+        document.querySelectorAll("esp-web-install-button").forEach((button) => {
+          button.overrides = {
+            checkSameFirmware: (manifest, info) =>
+              Boolean(manifest.improv_firmware) &&
+              info.firmware === manifest.improv_firmware,
+          };
+        });
+      });
+
       // "Tasmota 15.6.0.1" says what is installed; the release tag next to
       // it says exactly which build, and links to its source and binaries.
+      function renderVersion(manifest) {
+        if (!manifest.tasmota || !manifest.version || manifest.version === "dev") return;
+        const badge = document.getElementById("version");
+        badge.textContent = "Tasmota " + manifest.tasmota + " \u00b7 ";
+        const link = document.createElement("a");
+        link.href = "https://github.com/cateim/Tasmota/releases/tag/" + manifest.version;
+        link.textContent = manifest.version;
+        badge.append(link);
+      }
       fetch("manifests/ag8.json")
         .then((response) => response.json())
-        .then((manifest) => {
-          if (!manifest.version || manifest.version === "dev") return;
-          const badge = document.getElementById("version");
-          badge.textContent = "Tasmota " + manifest.version;
-          if (manifest.build) {
-            badge.append(" \u00b7 ");
-            const link = document.createElement("a");
-            link.href = "https://github.com/cateim/Tasmota/releases/tag/" + manifest.build;
-            link.textContent = manifest.build;
-            badge.append(link);
-          }
-        })
+        .then(renderVersion)
         .catch(() => {});
     </script>
   </body>

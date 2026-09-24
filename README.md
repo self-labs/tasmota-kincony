@@ -15,7 +15,7 @@ The official binaries do not fit these boards:
   full one but drops 97 features to fit a 4 MB ESP32, SPI among them, and with
   it the W5500 Ethernet. This build is the full `tasmota32s3` plus the full IR
   driver.
-- **KinCony KC868-A16 v3.** Its 16 relays and 16 inputs sit behind PCF8574
+- **KinCony KC868-A16v3.** Its 16 relays and 16 inputs sit behind PCF8574
   expanders, and `USE_PCF8574` is off in every official build, so the board
   boots with nothing to switch.
 
@@ -29,14 +29,15 @@ is plugged in.
 | Board                | Build               | Status                                                     |
 | -------------------- | ------------------- | ---------------------------------------------------------- |
 | KinCony AG8          | `tasmota32s3-ag8`   | in use: 8 emitters, receiver, Ethernet without USB         |
-| KinCony KC868-A16 v3 | `tasmota32s3-a16v3` | built and checked for every driver, not flashed on a board |
+| KinCony KC868-A16v3  | `tasmota32s3-a16v3` | flashed in September 2026; relays and inputs being verified |
 
 ## Before you flash
 
 - **Chrome or Edge on a desktop.** Flashing uses Web Serial, which Firefox,
   Safari, Android and iOS do not have.
-- **Back up the board.** Installing erases the whole flash, and the browser
-  cannot read it back. The KCS firmware itself is published per board on the
+- **Back up the board.** Erasing, which the installer offers and a board
+  coming from KCS needs, wipes the whole flash, and the browser cannot read it
+  back. The KCS firmware itself is published per board on the
   [KinCony forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), and
   the file inside the zip is a complete image that goes back at offset 0, so a
   board is never stranded. What no download brings back is what the board held:
@@ -85,20 +86,34 @@ Only two files carry the house changes: `platformio_tasmota_cenv.ini`, with the
 two environments, and the workflow that builds and releases them. A merge
 conflict in either is the only thing an upstream release can break.
 
-**The install button always writes the factory image**, at offset 0, with the
-flash erased first: bootloader, partition table, application and safeboot. A
-board flashed from the site is therefore always on the release shown there,
-whatever it was running before. Updating a board that already runs one of these
-builds does not need the site at all: upload the plain `.bin` of the release
-under **Firmware Upgrade** in the board's own web interface, and the settings
-survive.
+**The install button writes the factory image** at offset 0: bootloader,
+partition table, application and safeboot. What happens before that depends on
+the board.
+
+- **A board already running one of these builds** is recognised. It announces
+  itself over Improv as `Tasmota AG8` or `Tasmota A16v3` (the `CODE_IMAGE_STR`
+  of its build), each manifest names that string in `improv_firmware`, and the
+  page hands ESP Web Tools a `checkSameFirmware` that compares the two, so the
+  descriptive `name` of the manifest can stay. The page offers **Update**,
+  written without erasing, and the settings survive.
+- **Why always Update.** ESP Web Tools skips the install when the version the
+  board reports equals the manifest `version`, and a board reports the bare
+  Tasmota version, the same for every house build of that Tasmota. So the
+  manifest `version` is the release tag, which never matches, and a house-build
+  fix is always offered; the Tasmota version sits in a `tasmota` field that the
+  footer shows. The cost is that the page cannot say a board is up to date.
+- **Any other board** gets **Install**, and the installer first asks whether to
+  erase the flash, with the box unticked. Coming from KCS, tick it.
+
+Uploading the plain `.bin` under **Firmware Upgrade** in the board's own web
+interface updates a board just as well, without the site.
 
 ## Setting the board up after flashing
 
 The page lists the commands for each board: the GPIO template, `EthType 8`,
 and the board specific ones.
 
-The A16 v3 also needs two files on its own filesystem, served from
+The A16v3 also needs two files on its own filesystem, served from
 [`site/files/`](./site/files/) and linked from the page:
 
 - `pcf8574.dat` declares the 32 expander pins, 16 inputs as switches and 16

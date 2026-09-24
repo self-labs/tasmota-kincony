@@ -1,5 +1,6 @@
 {
   "name": "Tasmota for KinCony AG8",
+  "improv_firmware": "Tasmota AG8",
   "version": "dev",
   "home_assistant_domain": "tasmota",
   "new_install_prompt_erase": true,

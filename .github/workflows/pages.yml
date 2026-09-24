@@ -38,13 +38,17 @@ jobs:
             --dir site/firmware
           echo "FIRMWARE_TAG=$tag" >> "$GITHUB_ENV"
 
-      # The manifest version has to be the exact string the board reports
-      # over Improv, or ESP Web Tools never recognises a board as up to date.
-      # Tasmota builds it from TASMOTA_VERSION and drops the fourth number when
-      # it is zero (tasmota.ino:679-681), so 0x0F060001 is 15.6.0.1 and
-      # 0x0F070000 is 15.7.0. The release tag goes into "build", which ESP Web
-      # Tools ignores and the page shows next to the version.
-      - name: Stamp the Tasmota version into the manifests
+      # "version" is the release tag, on purpose. ESP Web Tools offers Update
+      # only when the version a recognised board reports over Improv differs
+      # from this field, and a board reports the bare Tasmota version, the same
+      # for every house build of that Tasmota. With the Tasmota version here a
+      # house-build fix would never be offered, and a board on a broken build
+      # would read as up to date. The tag never matches, so a recognised board
+      # is always offered Update, written without erasing.
+      # "tasmota" is what the footer shows: TASMOTA_VERSION at the tag, written
+      # the way Tasmota writes it, dropping a fourth number that is zero
+      # (tasmota.ino:679-681), so 0x0F060001 is 15.6.0.1 and 0x0F070000 15.7.0.
+      - name: Stamp the release and the Tasmota version into the manifests
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -56,7 +60,7 @@ jobs:
           if [ $(( v & 255 )) -ne 0 ]; then version="$version.$(( v & 255 ))"; fi
           echo "Tasmota $version, build $FIRMWARE_TAG"
           for manifest in site/manifests/*.json; do
-            jq --arg v "$version" --arg b "$FIRMWARE_TAG" '.version = $v | .build = $b' \
+            jq --arg t "$FIRMWARE_TAG" --arg v "$version" '.version = $t | .tasmota = $v' \
               "$manifest" > "$manifest.tmp"
             mv "$manifest.tmp" "$manifest"
           done

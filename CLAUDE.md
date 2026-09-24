@@ -11,7 +11,7 @@ site/
 ├── index.html            the page, with its CSS and a few lines of JavaScript inline
 └── manifests/
     ├── ag8.json          ESP Web Tools manifest for the AG8
-    └── a16v3.json        ESP Web Tools manifest for the A16 v3
+    └── a16v3.json        ESP Web Tools manifest for the A16v3
 .github/workflows/
 └── pages.yml             fetch the latest firmware release, stamp it, publish
 ```
@@ -43,8 +43,22 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
   Tools means changing the version in the URL and recomputing the `sha384`
   of that exact file. The hash covers the entry file only; the chunks it
   imports load from the same pinned version.
-- **Say what is untested.** The A16 v3 build has never been flashed on a board,
-  and the page says so. Keep that true until it has.
+- **Say what is unverified.** The A16v3 build has been flashed and runs on a
+  board, and its relays and inputs are still being verified; the status line
+  and the FAQ say so. Keep both in step with what has been checked on hardware.
+- **`improv_firmware` must equal what the board announces.** The page sets
+  `checkSameFirmware` to compare the board's Improv name with that field. The
+  board announces `Tasmota ` plus the `CODE_IMAGE_STR` of its build, so
+  renaming an image in `cateim/Tasmota` means changing the field in the same
+  breath, or the page stops recognising the board.
+- **The manifest `version` is the release tag, never the Tasmota version.**
+  ESP Web Tools hides the install when a recognised board reports the same
+  version, and every house build of one Tasmota reports the same bare
+  version, so the Tasmota version there would hide house-build fixes. The
+  Tasmota version goes in `tasmota`, for the footer.
+- **The installer asks before erasing.** `new_install_prompt_erase` shows an
+  "Erase device" box that starts unticked, and a recognised board is updated
+  without erasing at all. Never write that the page always erases.
 - **Never use em dashes or en dashes**, anywhere: page, README, commits.
 
 ## Commits
