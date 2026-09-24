@@ -1064,11 +1064,13 @@
           <div class="tile">
             <h3>Updating a board</h3>
             <p>
-              <strong>Use Firmware Upgrade, not this page.</strong> Upload
-              the plain <code>.bin</code> of the release in the board's own
-              web interface: it replaces the application and nothing else, so
-              the settings survive. Flashing from this page resets them, even
-              with "Erase device" unticked: the factory image carries a 4 MB partition table, Tasmota grows its filesystem to the whole 16 MB flash on the first boot, and writing the image again puts the small table back, so the filesystem, where the settings live, is formatted.
+              The page recognises a board that already runs one of these
+              builds, by the name it announces (<code>Tasmota AG8</code>,
+              <code>Tasmota A16v3</code>), and offers <strong>Update</strong>,
+              written without erasing. <strong>Back the configuration up
+              first</strong> (Configuration, Backup). Uploading the plain
+              <code>.bin</code> under Firmware Upgrade, in the board's own web
+              interface, replaces the application and nothing else.
             </p>
           </div>
           <div class="tile">
@@ -1114,14 +1116,13 @@
           <details>
             <summary>Are my settings kept when I flash from here?</summary>
             <p>
-              No, not on these boards, erase ticked or not. The image this
-              page writes carries a 4 MB partition table; Tasmota grows its
-              filesystem to the whole 16 MB flash on the first boot, and
-              writing the image again puts the small table back, so the
-              filesystem, where the settings live, is formatted. Back the
-              configuration up first (Configuration, Backup), or update a board
-              that already runs one of these builds with the plain
-              <code>.bin</code> under Firmware Upgrade, which keeps everything.
+              Back the configuration up before flashing from here
+              (Configuration, Backup). A board already on one of these builds
+              is offered Update, written without erasing. Anything else, KCS
+              included, gets a fresh install, and the installer asks first
+              whether to erase; coming from KCS, tick it. Uploading the plain
+              <code>.bin</code> under Firmware Upgrade, in the board's own web
+              interface, replaces the application and nothing else.
             </p>
           </details>
           <details>
@@ -1193,13 +1194,12 @@
       // version is the release tag, which never equals the bare Tasmota
       // version a board reports, so a house-build fix is always offered.
       //
-      // Off for now. Writing the factory image resets the settings of a board
-      // that already runs Tasmota, erase or not: its 4 MB partition table
-      // replaces the 16 MB one Tasmota created on the first boot, and the
-      // filesystem is formatted. Recognising the board would only put an
-      // "Update" label on that reset. Turn it back on together with a build
-      // whose image carries the 16 MB table.
-      const RECOGNISE_BOARDS = false;
+      // The images carry the 16 MB partition table Tasmota creates on the
+      // first boot, so writing one again should leave the filesystem, and the
+      // settings in it, alone. A 4 MB table there shrinks the filesystem back
+      // and formats it. Set this to false if an Update is ever seen to lose
+      // settings, until the cause is found.
+      const RECOGNISE_BOARDS = true;
       if (RECOGNISE_BOARDS) customElements.whenDefined("esp-web-install-button").then(() => {
         document.querySelectorAll("esp-web-install-button").forEach((button) => {
           button.overrides = {

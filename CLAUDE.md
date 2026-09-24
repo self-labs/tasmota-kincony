@@ -59,13 +59,13 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
 - **The installer asks before erasing.** `new_install_prompt_erase` shows an
   "Erase device" box that starts unticked. Never write that the page always
   erases.
-- **Never write that flashing from the page keeps the settings.** It does not,
-  on these boards, erase or not: the factory image carries a 4 MB partition
-  table, Tasmota grows the filesystem to 16 MB on the first boot and rewrites
-  the table, and writing the image again formats the filesystem. Updating a
-  board means Firmware Upgrade with the plain `.bin`. `RECOGNISE_BOARDS` stays
-  `false` until the builds carry the 16 MB table, and turning it on needs a
-  test on a board with its configuration backed up.
+- **No claim about what Update does to the settings until it is tested on a
+  board**, with the configuration backed up first. The images must carry the
+  16 MB partition table Tasmota creates on the first boot
+  (`partitions/esp32_partition_app2880k_fs12608k.csv` in the fork): with the
+  4 MB one, writing the image again shrinks the filesystem back and formats
+  it. `RECOGNISE_BOARDS` in the page turns recognition off if an Update is ever
+  seen to lose settings.
 - **Never use em dashes or en dashes**, anywhere: page, README, commits.
 
 ## Commits
