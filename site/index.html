@@ -873,8 +873,9 @@
                   </li>
                 </ol>
                 <p style="font-size: 0.88rem; color: var(--muted)">
-                  Full guide, in Portuguese:
-                  <a href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-ag8.md">KinCony AG8 no Home Assistant</a>.
+                  The infrared side of this board is handled by
+                  <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>,
+                  which has its own documentation.
                 </p>
               </details>
             </div>
@@ -948,16 +949,17 @@
                   <li><code>EthType 8</code> for the Ethernet.</li>
                   <li>
                     Upload
-                    <a href="https://raw.githubusercontent.com/self-labs/homeassistant/master/assets/configs/tasmota/a16v3/pcf8574.dat" download><code>pcf8574.dat</code></a>
+                    <a href="files/pcf8574.dat" download><code>pcf8574.dat</code></a>
                     and
-                    <a href="https://raw.githubusercontent.com/self-labs/homeassistant/master/assets/configs/tasmota/a16v3/display.ini" download><code>display.ini</code></a>
+                    <a href="files/display.ini" download><code>display.ini</code></a>
                     under <strong>Consoles → Manage File System</strong>, and restart.
                   </li>
                   <li><code>SetOption114 1</code>, or closing input 1 switches relay 1.</li>
                 </ol>
                 <p style="font-size: 0.88rem; color: var(--muted)">
-                  Full guide, in Portuguese:
-                  <a href="https://github.com/self-labs/homeassistant/blob/master/docs/kincony-a16v3.md">KinCony KC868-A16 v3 no Home Assistant</a>.
+                  Both files come from this repository and are what turn the
+                  32 expander pins into relays and inputs, and the panel into a
+                  screen Tasmota can write to.
                 </p>
               </details>
             </div>
@@ -1150,9 +1152,7 @@
           <p>
             Built with
             <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools</a>.
-            Home Assistant guides in
-            <a href="https://github.com/self-labs/homeassistant">self-labs/homeassistant</a>,
-            infrared integration in
+            Infrared in Home Assistant through
             <a href="https://github.com/self-labs/tasmota-ir">tasmota-ir</a>.
             Not affiliated with KinCony or with the Tasmota project.
           </p>
@@ -1173,11 +1173,20 @@
           setTimeout(() => (button.textContent = "Copy"), 2000);
         });
       });
+      // "Tasmota 15.6.0.1" says what is installed; the release tag next to
+      // it says exactly which build, and links to its source and binaries.
       fetch("manifests/ag8.json")
         .then((response) => response.json())
         .then((manifest) => {
-          if (manifest.version) {
-            document.getElementById("version").textContent = manifest.version;
+          if (!manifest.version || manifest.version === "dev") return;
+          const badge = document.getElementById("version");
+          badge.textContent = "Tasmota " + manifest.version;
+          if (manifest.build) {
+            badge.append(" \u00b7 ");
+            const link = document.createElement("a");
+            link.href = "https://github.com/cateim/Tasmota/releases/tag/" + manifest.build;
+            link.textContent = manifest.build;
+            badge.append(link);
           }
         })
         .catch(() => {});

@@ -38,10 +38,26 @@ jobs:
             --dir site/firmware
           echo "FIRMWARE_TAG=$tag" >> "$GITHUB_ENV"
 
-      - name: Stamp the release into the manifests
+      # The manifest version has to be the exact string the board reports
+      # over Improv, or ESP Web Tools never recognises a board as up to date.
+      # Tasmota builds it from TASMOTA_VERSION and drops the fourth number when
+      # it is zero (tasmota.ino:679-681), so 0x0F060001 is 15.6.0.1 and
+      # 0x0F070000 is 15.7.0. The release tag goes into "build", which ESP Web
+      # Tools ignores and the page shows next to the version.
+      - name: Stamp the Tasmota version into the manifests
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          hex=$(gh api "repos/cateim/Tasmota/contents/tasmota/include/tasmota_version.h?ref=$FIRMWARE_TAG" \
+            --jq .content | base64 -d | grep -oE 'TASMOTA_VERSION = 0x[0-9A-Fa-f]{8}' | grep -oE '0x[0-9A-Fa-f]{8}')
+          test -n "$hex" || { echo "TASMOTA_VERSION not found at $FIRMWARE_TAG"; exit 1; }
+          v=$((hex))
+          version="$(( (v >> 24) & 255 )).$(( (v >> 16) & 255 )).$(( (v >> 8) & 255 ))"
+          if [ $(( v & 255 )) -ne 0 ]; then version="$version.$(( v & 255 ))"; fi
+          echo "Tasmota $version, build $FIRMWARE_TAG"
           for manifest in site/manifests/*.json; do
-            jq --arg v "$FIRMWARE_TAG" '.version = $v' "$manifest" > "$manifest.tmp"
+            jq --arg v "$version" --arg b "$FIRMWARE_TAG" '.version = $v | .build = $b' \
+              "$manifest" > "$manifest.tmp"
             mv "$manifest.tmp" "$manifest"
           done
 

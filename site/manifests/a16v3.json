@@ -1,5 +1,5 @@
 {
-  "name": "Tasmota for KinCony KC868-A16 v3",
+  "name": "Tasmota for KinCony KC868-A16v3",
   "version": "dev",
   "home_assistant_domain": "tasmota",
   "new_install_prompt_erase": true,

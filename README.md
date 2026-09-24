@@ -26,10 +26,10 @@ is plugged in.
 
 ## Boards
 
-| Board                  | Build               | Status                                                     |
-| ---------------------- | ------------------- | ---------------------------------------------------------- |
-| KinCony AG8            | `tasmota32s3-ag8`   | in use: 8 emitters, receiver, Ethernet without USB         |
-| KinCony KC868-A16 v3   | `tasmota32s3-a16v3` | built and checked for every driver, not flashed on a board |
+| Board                | Build               | Status                                                     |
+| -------------------- | ------------------- | ---------------------------------------------------------- |
+| KinCony AG8          | `tasmota32s3-ag8`   | in use: 8 emitters, receiver, Ethernet without USB         |
+| KinCony KC868-A16 v3 | `tasmota32s3-a16v3` | built and checked for every driver, not flashed on a board |
 
 ## Before you flash
 
@@ -96,10 +96,16 @@ survive.
 ## Setting the board up after flashing
 
 The page lists the commands for each board: the GPIO template, `EthType 8`,
-and the board specific ones. The full guides are in Portuguese, in
-[self-labs/homeassistant](https://github.com/self-labs/homeassistant):
-[AG8](https://github.com/self-labs/homeassistant/blob/master/docs/kincony-ag8.md)
-and [A16 v3](https://github.com/self-labs/homeassistant/blob/master/docs/kincony-a16v3.md).
+and the board specific ones.
+
+The A16 v3 also needs two files on its own filesystem, served from
+[`site/files/`](./site/files/) and linked from the page:
+
+- `pcf8574.dat` declares the 32 expander pins, 16 inputs as switches and 16
+  relays inverted. Without it the expanders are detected and nothing is
+  switchable.
+- `display.ini` describes the SSD1306 panel, which no longer has a build flag
+  of its own.
 
 For infrared in Home Assistant, the AG8 pairs with
 [Tasmota IR](https://github.com/self-labs/tasmota-ir).
