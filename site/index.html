@@ -1258,6 +1258,27 @@
             </p>
           </details>
           <details>
+            <summary>The serial log says "SHA-256 comparison failed". Is it broken?</summary>
+            <p>
+              No. The lines right after it say <code>Attempting to boot
+              anyway...</code>, and the board does. The chip's ROM checks a
+              SHA-256 stored at the end of the bootloader before starting it,
+              and without secure boot a mismatch is only a warning. Builds from
+              before 24 September 2026 wrote a bootloader that declared 4 MB of
+              flash; on its first boot Tasmota corrects that byte to the real
+              16 MB (<code>resize_max_flash_size_k</code> in
+              <code>partition_core.be</code>) and leaves the hash as it was, so
+              the ROM prints this on every boot from then on. The
+              <em>Expected</em> hash in the log is the one for the 4 MB header,
+              and the <em>Calculated</em> one is the same bootloader with
+              16 MB. Current builds declare 16 MB from the start, with a
+              matching hash, so a board installed or updated from this page
+              stops showing it. An update over the air replaces only the
+              application and keeps the old bootloader, and the message with
+              it, which is harmless.
+            </p>
+          </details>
+          <details>
             <summary>Does the board phone home?</summary>
             <p>
               No. Tasmota talks to your MQTT broker and to whatever you point it
