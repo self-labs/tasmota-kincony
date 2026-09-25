@@ -897,6 +897,15 @@
                         <code>http://192.168.4.1</code> and enter your Wi-Fi
                         there.
                       </li>
+                      <li>
+                        The installer says <strong>Disconnected</strong>? That
+                        is the board restarting: Tasmota restarts to join the
+                        network once it has the Wi-Fi, and on these boards the
+                        USB comes straight from the ESP32-S3, so every restart
+                        makes the port vanish from the browser. The Wi-Fi is
+                        already saved. Close it, wait 20 seconds and look for
+                        the board on your router or in Home Assistant.
+                      </li>
                     </ul>
                   </li>
                   <li>
@@ -1009,7 +1018,7 @@
                 <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary>After flashing, six steps</summary>
+                <summary>After flashing, seven steps</summary>
                 <p class="where">
                   Every command below goes in the board's own page:
                   <strong>Tools → Console</strong>. Paste it, press Enter.
@@ -1026,6 +1035,15 @@
                         <code>http://192.168.4.1</code> and enter your Wi-Fi
                         there.
                       </li>
+                      <li>
+                        The installer says <strong>Disconnected</strong>? That
+                        is the board restarting: Tasmota restarts to join the
+                        network once it has the Wi-Fi, and on these boards the
+                        USB comes straight from the ESP32-S3, so every restart
+                        makes the port vanish from the browser. The Wi-Fi is
+                        already saved. Close it, wait 20 seconds and look for
+                        the board on your router or in Home Assistant.
+                      </li>
                     </ul>
                   </li>
                   <li>
@@ -1033,13 +1051,16 @@
                     <code>Module 0</code> as a second command. The board
                     restarts after <code>Module 0</code>.
                     <div class="code">
-                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,0,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
+                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
                       <button class="copy-btn" data-copy="a16-template">Copy</button>
                     </div>
                     <div class="code">
                       <pre id="a16-module">Module 0</pre>
                       <button class="copy-btn" data-copy="a16-module">Copy</button>
                     </div>
+                    <ul class="why">
+                      <li>The template already puts a WS2812 LED strip on <code>GPIO41</code>, pin 3 of the <code>P12</code> header beside the ESP32-S3 (<code>39 40 41 GND 3V3</code>). With no strip wired there, the light it creates simply lights nothing.</li>
+                    </ul>
                   </li>
                   <li>
                     <strong>Ethernet.</strong> <code>8</code> is the W5500 chip
@@ -1084,6 +1105,18 @@
                       <li><code>SetOption65 1</code>: seven quick power cycles no longer erase every setting.</li>
                       <li><code>SetOption36 0</code>: five or six quick restarts no longer clear the template and the module.</li>
                       <li><code>Timezone -3</code>: Brazil time. Tasmota ships at UTC+1; put your own offset instead of <code>-3</code>.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>LED strip.</strong> Only with a strip on
+                    <code>GPIO41</code>. One line, two settings:
+                    <div class="code">
+                      <pre id="a16-strip">Backlog Pixels 7; Dimmer 30</pre>
+                      <button class="copy-btn" data-copy="a16-strip">Copy</button>
+                    </div>
+                    <ul class="why">
+                      <li><code>Pixels 7</code>: how many LEDs the strip has. Tasmota starts at 30; put your own count.</li>
+                      <li><code>Dimmer 30</code>: 30% brightness. The strip draws from the board's 5 V, the same rail as the ESP32, so keep it low until you have measured that 5 V with the strip lit.</li>
                     </ul>
                   </li>
                 </ol>
