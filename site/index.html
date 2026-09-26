@@ -259,6 +259,71 @@
         border-color: rgba(255, 255, 255, 0.4);
       }
 
+      /* ---------- find a board ---------- */
+      .finder {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px;
+      }
+      .finder-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .btn-find {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-find:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .btn-find-alt {
+        background: transparent;
+        color: var(--blue-600);
+        border-color: var(--line);
+      }
+      .finder-status {
+        margin: 14px 0 0;
+        font-size: 0.95rem;
+      }
+      .finder-status:empty {
+        display: none;
+      }
+      .finder-result {
+        margin-top: 14px;
+        display: grid;
+        gap: 8px;
+      }
+      .finder-result .net {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .finder-result .kind {
+        min-width: 4.5em;
+        font-weight: 650;
+      }
+      .finder-result .addr {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        overflow-wrap: anywhere;
+      }
+      .finder-result .addr small {
+        color: var(--muted);
+        font-family: inherit;
+      }
+      .finder-note {
+        margin: 14px 0 0;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
       /* ---------- sections ---------- */
       main {
         padding-bottom: 72px;
@@ -1051,7 +1116,7 @@
                     <code>Module 0</code> as a second command. The board
                     restarts after <code>Module 0</code>.
                     <div class="code">
-                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
+                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,6210,0,1312,1313],"FLAG":0,"BASE":1}</pre>
                       <button class="copy-btn" data-copy="a16-template">Copy</button>
                     </div>
                     <div class="code">
@@ -1060,6 +1125,7 @@
                     </div>
                     <ul class="why">
                       <li>The template already puts a WS2812 LED strip on <code>GPIO41</code>, pin 3 of the <code>P12</code> header beside the ESP32-S3 (<code>39 40 41 GND 3V3</code>). With no strip wired there, the light it creates simply lights nothing.</li>
+                      <li>It also marks <code>GPIO45</code>, which nothing is wired to, as <em>Option A3</em>: without that mark Tasmota never starts its display driver and never reads <code>display.ini</code>. <code>Display</code> should then answer <code>Model 17</code>, 128x64.</li>
                     </ul>
                   </li>
                   <li>
@@ -1082,6 +1148,9 @@
                       <pre id="a16-restart">Restart 1</pre>
                       <button class="copy-btn" data-copy="a16-restart">Copy</button>
                     </div>
+                    <ul class="why">
+                      <li>Optional, a third file: <a href="files/autoexec.be" download><code>autoexec.be</code></a> writes the board's name and its Wi-Fi and cable addresses on the display at every boot, so it can be found without a computer. The SSD1306 is a module that plugs into its own socket on the board.</li>
+                    </ul>
                   </li>
                   <li>
                     <strong>Inputs.</strong> One line, two settings:
@@ -1128,6 +1197,47 @@
               </details>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section id="find">
+        <div class="section-head">
+          <div class="eyebrow">Already flashed</div>
+          <h2>Find a board on your network</h2>
+          <p>
+            Plug it in by USB and let this page ask it. It answers with its
+            Wi-Fi and cable addresses; nothing is written to the board.
+          </p>
+        </div>
+        <div class="finder">
+          <div class="finder-actions">
+            <button class="btn btn-find" id="find-btn" type="button">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" />
+              </svg>
+              Find my board
+            </button>
+            <button class="btn btn-find-alt" id="find-restart" type="button" hidden>
+              Restart it over USB and ask again
+            </button>
+          </div>
+          <p class="finder-status" id="find-status" role="status"></p>
+          <div class="finder-result" id="find-result" hidden>
+            <div class="net">
+              <span class="kind">Wi-Fi</span>
+              <span class="addr" id="find-wifi"></span>
+            </div>
+            <div class="net">
+              <span class="kind">Cable</span>
+              <span class="addr" id="find-eth"></span>
+            </div>
+          </div>
+          <p class="finder-note">
+            Close the installer's window first: only one page can hold the
+            port. A board that was already running from 12 V before the USB
+            went in does not answer over USB; the second button restarts it
+            so it does, and the relays go back to where they were.
+          </p>
         </div>
       </section>
 
@@ -1291,6 +1401,23 @@
             </p>
           </details>
           <details>
+            <summary>Where is my board on the network?</summary>
+            <p>
+              <a href="#find">Find my board</a>, on this page, asks it over USB
+              and shows both addresses. By hand, press <strong>Install</strong>
+              on the board's card, pick the port, open
+              <strong>Logs &amp; Console</strong>, type <code>Status 5</code>
+              and press Enter. In the answer,
+              <code>IPAddress</code> is the Wi-Fi address and the one inside
+              <code>"Ethernet"</code> is the cable's; <code>0.0.0.0</code>
+              means that side is not connected. The board only listens on
+              USB when the cable was already plugged in as it started: if it
+              was powered from 12 V first, the log says <code>no SOF packet
+              detected on USB port</code>. Restart it with the USB plugged in,
+              by the reset button or by cutting the power, and ask again.
+            </p>
+          </details>
+          <details>
             <summary>The serial log says "SHA-256 comparison failed". Is it broken?</summary>
             <p>
               No. The lines right after it say <code>Attempting to boot
@@ -1348,6 +1475,189 @@
     </footer>
 
     <script>
+      // Find a board on the network: ask it "Status 5" over USB and show the
+      // Wi-Fi and cable addresses from the answer. Tasmota only takes the USB
+      // as its console when a host was there at boot (tasmota.ino, "no SOF
+      // packet detected on USB port"), so a board started from 12 V first stays
+      // silent; the second button restarts it through the USB-Serial-JTAG
+      // reset lines, the same way the installer does, and asks again.
+      (() => {
+        const findBtn = document.getElementById("find-btn");
+        const restartBtn = document.getElementById("find-restart");
+        const statusEl = document.getElementById("find-status");
+        const resultEl = document.getElementById("find-result");
+        const ESPRESSIF = 0x303a;
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const say = (text) => (statusEl.textContent = text);
+
+        if (!("serial" in navigator)) {
+          findBtn.disabled = true;
+          say("This needs Chrome or Edge on a desktop computer.");
+          return;
+        }
+
+        // The answer is one log line: "... RSL: STATUS5 = {json}".
+        function parseStatus5(text) {
+          const at = text.lastIndexOf("STATUS5 = ");
+          if (at < 0) return null;
+          const start = text.indexOf("{", at);
+          const end = text.indexOf("\n", start);
+          if (start < 0 || end < 0) return null;
+          try {
+            return JSON.parse(text.slice(start, end).trim()).StatusNET || null;
+          } catch {
+            return null;
+          }
+        }
+        window.parseStatus5 = parseStatus5; // exposed for testing
+
+        function address(ip, host) {
+          const box = document.createElement("span");
+          if (!ip || ip === "0.0.0.0") {
+            box.textContent = "not connected";
+            return box;
+          }
+          const link = document.createElement("a");
+          link.href = `http://${ip}/`;
+          link.target = "_blank";
+          link.rel = "noopener";
+          link.textContent = ip;
+          box.append(link);
+          if (host) {
+            const small = document.createElement("small");
+            small.textContent = ` ${host}`;
+            box.append(small);
+          }
+          return box;
+        }
+
+        function show(net) {
+          const eth = net.Ethernet || {};
+          document.getElementById("find-wifi").replaceChildren(address(net.IPAddress, net.Hostname));
+          document.getElementById("find-eth").replaceChildren(address(eth.IPAddress, eth.Hostname));
+          resultEl.hidden = false;
+          const online = [net.IPAddress, eth.IPAddress].some((ip) => ip && ip !== "0.0.0.0");
+          say(
+            online
+              ? "Found it. The addresses open the board's own page."
+              : "The board answered, but it is on no network yet. Type WifiConfig 2 in the installer's console to open its own Wi-Fi for 3 minutes."
+          );
+        }
+
+        // Ask "Status 5" until an answer arrives or time runs out. After a
+        // restart the network needs a few seconds, so an answer with no
+        // address is asked again until one appears or the time is up.
+        async function ask(port, ms, wantAddress) {
+          const reader = port.readable.getReader();
+          const writer = port.writable.getWriter();
+          const decoder = new TextDecoder();
+          const deadline = Date.now() + ms;
+          let text = "";
+          let last = null;
+          let nextAsk = 0;
+          try {
+            while (Date.now() < deadline) {
+              if (Date.now() >= nextAsk) {
+                await writer.write(new TextEncoder().encode("\nStatus 5\n"));
+                nextAsk = Date.now() + 3000;
+              }
+              const chunk = await Promise.race([
+                reader.read(),
+                sleep(Math.max(50, Math.min(nextAsk, deadline) - Date.now())).then(() => ({})),
+              ]);
+              if (chunk.done) break;
+              if (!chunk.value) continue;
+              text = (text + decoder.decode(chunk.value, { stream: true })).slice(-8000);
+              const net = parseStatus5(text);
+              if (net) {
+                last = net;
+                text = "";
+                const eth = net.Ethernet || {};
+                const online = [net.IPAddress, eth.IPAddress].some((ip) => ip && ip !== "0.0.0.0");
+                if (online || !wantAddress) return net;
+              }
+            }
+            return last;
+          } finally {
+            try { await reader.cancel(); } catch {}
+            reader.releaseLock();
+            writer.releaseLock();
+          }
+        }
+
+        async function openPort(port) {
+          try {
+            await port.open({ baudRate: 115200 });
+            return true;
+          } catch {
+            say("The port is busy. Close the installer's window, or any other page using it, and try again.");
+            return false;
+          }
+        }
+
+        let chosen = null;
+
+        findBtn.addEventListener("click", async () => {
+          resultEl.hidden = true;
+          restartBtn.hidden = true;
+          try {
+            chosen = await navigator.serial.requestPort({ filters: [{ usbVendorId: ESPRESSIF }] });
+          } catch {
+            return; // the chooser was closed
+          }
+          if (!(await openPort(chosen))) return;
+          say("Asking the board...");
+          const net = await ask(chosen, 4000, false);
+          await chosen.close().catch(() => {});
+          if (net) {
+            show(net);
+          } else {
+            say("No answer. The board probably started before the USB went in, and then it does not listen on USB.");
+            restartBtn.hidden = false;
+          }
+        });
+
+        restartBtn.addEventListener("click", async () => {
+          if (!chosen || !(await openPort(chosen))) return;
+          restartBtn.hidden = true;
+          say("Restarting the board...");
+          const info = chosen.getInfo();
+          // RTS up with DTR down holds the chip in reset; releasing RTS starts it.
+          await chosen.setSignals({ dataTerminalReady: false, requestToSend: true }).catch(() => {});
+          await sleep(250);
+          await chosen.setSignals({ dataTerminalReady: false, requestToSend: false }).catch(() => {});
+          await chosen.close().catch(() => {});
+          // The ESP32-S3 serves USB itself, so the port vanishes and comes back.
+          say("Waiting for the board to come back...");
+          let port = null;
+          for (let i = 0; i < 40 && !port; i++) {
+            await sleep(500);
+            const ports = await navigator.serial.getPorts();
+            port = ports.find((p) => {
+              const x = p.getInfo();
+              return x.usbVendorId === info.usbVendorId && x.usbProductId === info.usbProductId;
+            });
+            if (port) {
+              try {
+                await port.open({ baudRate: 115200 });
+              } catch {
+                port = null; // not ready yet
+              }
+            }
+          }
+          if (!port) {
+            say("The board did not come back on USB. Unplug the USB, plug it back in and press Find my board again.");
+            return;
+          }
+          chosen = port;
+          say("Waiting for its network...");
+          const net = await ask(port, 25000, true);
+          await port.close().catch(() => {});
+          if (net) show(net);
+          else say("Still no answer. Open the installer's Logs & Console to see what the board is saying.");
+        });
+      })();
+
       document.querySelectorAll("button.copy-btn").forEach((button) => {
         button.addEventListener("click", async () => {
           const text = document.getElementById(button.dataset.copy).textContent;
