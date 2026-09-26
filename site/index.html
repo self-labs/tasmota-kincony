@@ -260,6 +260,11 @@
       }
 
       /* ---------- find a board ---------- */
+      /* .btn and .finder-result set their own display, which beats the
+         browser's rule for the hidden attribute; this puts it back. */
+      .finder [hidden] {
+        display: none !important;
+      }
       .finder {
         background: var(--surface);
         border: 1px solid var(--line);
@@ -1116,7 +1121,7 @@
                     <code>Module 0</code> as a second command. The board
                     restarts after <code>Module 0</code>.
                     <div class="code">
-                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,6210,0,1312,1313],"FLAG":0,"BASE":1}</pre>
+                      <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
                       <button class="copy-btn" data-copy="a16-template">Copy</button>
                     </div>
                     <div class="code">
@@ -1125,7 +1130,7 @@
                     </div>
                     <ul class="why">
                       <li>The template already puts a WS2812 LED strip on <code>GPIO41</code>, pin 3 of the <code>P12</code> header beside the ESP32-S3 (<code>39 40 41 GND 3V3</code>). With no strip wired there, the light it creates simply lights nothing.</li>
-                      <li>It also marks <code>GPIO45</code>, which nothing is wired to, as <em>Option A3</em>: without that mark Tasmota never starts its display driver and never reads <code>display.ini</code>. <code>Display</code> should then answer <code>Model 17</code>, 128x64.</li>
+                      <li>The display stays off on purpose. Turning it on takes an <em>Option A3</em> mark in the template, and the display then claims a power slot of its own: after the 16 relays it becomes power 17, the strip light moves to 18 and stops answering in Home Assistant. On a board without the strip, mark <code>GPIO45</code> as <code>6210</code> and the display comes on.</li>
                     </ul>
                   </li>
                   <li>
@@ -1148,9 +1153,6 @@
                       <pre id="a16-restart">Restart 1</pre>
                       <button class="copy-btn" data-copy="a16-restart">Copy</button>
                     </div>
-                    <ul class="why">
-                      <li>Optional, a third file: <a href="files/autoexec.be" download><code>autoexec.be</code></a> writes the board's name and its Wi-Fi and cable addresses on the display at every boot, so it can be found without a computer. The SSD1306 is a module that plugs into its own socket on the board.</li>
-                    </ul>
                   </li>
                   <li>
                     <strong>Inputs.</strong> One line, two settings:
@@ -1190,9 +1192,10 @@
                   </li>
                 </ol>
                 <p style="font-size: 0.88rem; color: var(--muted)">
-                  Both files come from this repository and are what turn the
-                  32 expander pins into relays and inputs, and the panel into a
-                  screen Tasmota can write to.
+                  Both files come from this repository. <code>pcf8574.dat</code>
+                  turns the 32 expander pins into relays and inputs;
+                  <code>display.ini</code> describes the SSD1306 and is only
+                  read on a board that turns the display on (step 2).
                 </p>
               </details>
             </div>
