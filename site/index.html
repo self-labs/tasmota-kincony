@@ -1155,14 +1155,32 @@
                     </div>
                   </li>
                   <li>
-                    <strong>Inputs.</strong> One line, two settings:
+                    <strong>Inputs.</strong> Each input drives the relay with
+                    the same number, always. One line, two settings:
                     <div class="code">
-                      <pre id="a16-inputs">Backlog SetOption114 1; SwitchMode0 2</pre>
+                      <pre id="a16-inputs">Backlog SetOption114 0; SwitchMode0 3</pre>
                       <button class="copy-btn" data-copy="a16-inputs">Copy</button>
                     </div>
                     <ul class="why">
-                      <li><code>SetOption114 1</code>: the inputs stop switching the relays. Without it, closing input 1 flips relay 1.</li>
-                      <li><code>SwitchMode0 2</code>: all 16 inputs read on while the contact is closed. It is also what makes Home Assistant create them as sensors; in the default mode they only show up as automation triggers.</li>
+                      <li><code>SetOption114 0</code>: input 1 switches relay 1, and so on up to 16, on the board itself, with no Home Assistant and no network. It is Tasmota's default, written out so it also undoes the variant below.</li>
+                      <li><code>SwitchMode0 3</code>: for pushbuttons, the wall buttons that spring back, the usual case. Each press toggles the relay; releasing does nothing.</li>
+                      <li>Latching switches and pulsing outputs are set per channel, and the input keeps its relay. <code>SwitchMode1 0</code> gives input 1 a latching switch, the kind that stays where you leave it: every flip toggles the relay, so the switch position never has to match the relay when Home Assistant switches it too. <code>PulseTime13 5</code> turns relay 13 off by itself after 0.5 s: 1 to 111 are tenths of a second, above that it is seconds plus 100, and <code>0</code> removes the pulse.</li>
+                      <li>Home Assistant shows the 16 relays, not the inputs: with <code>SetOption114 0</code> Tasmota does not announce them.</li>
+                    </ul>
+                    <p>
+                      <strong>Variant: inputs for Home Assistant only.</strong>
+                      The inputs stop driving the relays and show up in Home
+                      Assistant as 16 binary sensors, and an automation decides
+                      what each one does:
+                    </p>
+                    <div class="code">
+                      <pre id="a16-inputs-ha">Backlog SetOption114 1; SwitchMode0 2</pre>
+                      <button class="copy-btn" data-copy="a16-inputs-ha">Copy</button>
+                    </div>
+                    <ul class="why">
+                      <li><code>SetOption114 1</code>: closing input 1 no longer flips relay 1.</li>
+                      <li><code>SwitchMode0 2</code>: a closed contact reads on. It is also what makes Home Assistant create the inputs as sensors; in mode 0 they only show up as automation triggers.</li>
+                      <li>Switching between the two removes or recreates the 16 input sensors in Home Assistant, along with any area or name given to them there.</li>
                     </ul>
                   </li>
                   <li>

@@ -115,7 +115,7 @@ in the board's own page under **Tools → Console**.
 | Template             | `Template {...}` from the card, then `Module 0` on its own                             |
 | Ethernet             | `EthType 8`                                                                            |
 | The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1` |
-| Inputs               | `Backlog SetOption114 1; SwitchMode0 2`                                                |
+| Inputs               | `Backlog SetOption114 0; SwitchMode0 3`                                                |
 | Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                    |
 | LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                 |
 
@@ -134,12 +134,32 @@ in the board's own page under **Tools → Console**.
   boards come back from it with no relays and no Ethernet.
 - **`Timezone`**: Tasmota ships set to UTC+1 (`APP_TIMEZONE 1`). `-3` is
   Brazil; put your own offset.
-- **`SetOption114 1`** stops the A16v3 inputs from switching the relays: without
-  it, closing input 1 flips relay 1.
-- **`SwitchMode0 2`** sets all 16 inputs at once to read on while the contact
-  is closed, and it is what makes Home Assistant create them as binary sensors.
-  In mode 0, Tasmota's default, the integration only offers automation
-  triggers.
+- **`SetOption114 0`** makes each A16v3 input drive the relay with the same
+  number, always, on the board itself, so a wall button works with no Home
+  Assistant and no network (`support_switch_v4.ino`). It is Tasmota's default,
+  written out so it also undoes the variant below. Home Assistant then shows
+  the 16 relays and not the inputs, which Tasmota no longer announces
+  (`xdrv_12_discovery.ino`).
+- **`SwitchMode0 3`** is for pushbuttons, the wall buttons that spring back and
+  the usual case: each press toggles the relay, and releasing does nothing.
+  Nothing toggles at boot, since the inputs are read as they are when Tasmota
+  starts (`Pcf8574AddSwitch` in `xdrv_28_pcf8574_v2.ino`) and ignored for the
+  first 4 seconds.
+- **Per channel**, and each input keeps its relay: `SwitchMode<n> 0` gives
+  input `n` a latching switch, the kind that stays where you leave it, where
+  every flip toggles the relay, so the switch position never has to match the
+  relay when Home Assistant switches it too. `PulseTime<n>` turns relay `n` off
+  by itself after a while: 1 to 111 are tenths of a second, above that it is
+  seconds plus 100, and `0` removes the pulse (`SetPulseTimer` in
+  `support_tasmota.ino`). A latching switch on input 1 and four relays pulsing
+  half a second, for a gate, a door strike or an impulse relay:
+  `Backlog SwitchMode1 0; PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
+- **The variant, inputs for Home Assistant only**:
+  `Backlog SetOption114 1; SwitchMode0 2`. The inputs stop driving the relays
+  and come up as 16 binary sensors, a closed contact reading on; mode 2 is what
+  makes the integration create them, since in mode 0 it only offers automation
+  triggers. Moving between the two removes or recreates those sensors in Home
+  Assistant, with any area or name given to them there.
 
 ### The A16v3 files, strip and display
 
