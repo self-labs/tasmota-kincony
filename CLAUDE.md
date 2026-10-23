@@ -95,5 +95,22 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
 ## Changelog
 
 `CHANGELOG.md` follows Keep a Changelog 1.1.0. Changes land in `[Unreleased]`
-before a task is reported as done. The site has no version of its own; the
-firmware version is the release tag stamped into the manifests.
+before a task is reported as done.
+
+## Versions
+
+- **CalVer `YYYY.M.R`, as an annotated git tag `vYYYY.M.R`.** Versioning
+  started on 23/10/2026: `v2026.9.1` (end of September) and `v2026.10.1`
+  (2 October) were tagged afterwards on the commits of those days, with the
+  tag date set to the commit's, and `v2026.10.2` is the first tagged as it
+  was made. There is no version field anywhere: the tag and the changelog
+  heading are the whole version. No GitHub Release either; the site ships
+  through Pages, and the workflow never reads this repository's tags.
+- **Closing a version:** `[Unreleased]` becomes `## [YYYY.M.R] - YYYY-MM-DD`,
+  a fresh empty `[Unreleased]` opens above it, and the footer links move
+  (`compare/vPREVIOUS...vNEW`, and `[Unreleased]` compares from the new tag).
+  Then the commit, then `git tag -a vYYYY.M.R -m "<summary>"`, pushed together.
+- **Two different versions, never mixed.** The repository's tag dates the
+  page and the workflow. The firmware is identified by the `cateim/Tasmota`
+  release (`kincony-YYYYMMDD-<sha>`) stamped into the manifests and shown in
+  the footer; it changes without any commit here.

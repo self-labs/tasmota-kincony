@@ -3,15 +3,41 @@
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
-The site has no version of its own: the firmware it serves is identified by the
-`cateim/Tasmota` release it was taken from, shown at the bottom of the page.
+Versions follow **CalVer `YYYY.M.R`** (year, month without a leading zero,
+revision within the month) and are git tags of this repository, `vYYYY.M.R`:
+they date the page, the README and the workflow. The firmware the page serves
+has an identity of its own, the `cateim/Tasmota` release it was taken from,
+shown at the bottom of the page.
 
 ## [Unreleased]
+
+## [2026.10.2] - 2026-10-23
 
 ### Added
 
 - **The page in Brazilian Portuguese, with a language switch.** An EN | PT switch sits in the top bar. The visitor's own choice comes first and is remembered in the browser; with no choice made, a browser in any Portuguese (pt-BR, pt-PT) gets pt-BR and any other language gets English. The English stays in `index.html`; the Portuguese lives in `site/i18n.js`, keyed by each element's `data-i18n`, and also covers the messages of Find my board, the Copy buttons and the version line. The installer's own dialog stays in English: it comes from ESP Web Tools. Checked in Chromium with pt-BR, pt-PT, en-US and es-ES browsers, switching both ways and reloading.
 - **The README in Brazilian Portuguese**, `README.pt-BR.md`, with a link between the two at the top of each.
+
+### Changed
+
+- **The name is Tasmota KinCony**, the same in both languages: the top bar sets "KinCony" in a lighter weight instead of joining the two with "for", and the browser tab, the link preview and both READMEs follow.
+- **A16v3 inputs default to latching switches.** The Inputs step now sends `Backlog SetOption114 0; SwitchMode0 0`: every flip of a wall switch toggles its relay, which is what most houses have, and the switch position never has to match the relay when Home Assistant switches it too. A pushbutton became the per-channel exception, `SwitchMode<n> 3`. The README's table and notes follow. Two boards in a client's restaurant were set this way on 23 October 2026, read back from the boards; the switches themselves have not been flipped yet.
+- **On a phone the top bar keeps only the name and the language switch**, since the hero already leads to the boards and the footer links the source.
+
+### Fixed
+
+- **The page scrolled sideways on a phone.** The board cards asked for at least 330 px, wider than a 360 px screen leaves after its margins; they now shrink to the screen.
+
+## [2026.10.1] - 2026-10-02
+
+### Changed
+
+- **Each A16v3 input now drives its own relay, always.** The Inputs step sends `Backlog SetOption114 0; SwitchMode0 3`: input 1 switches relay 1 and so on, on the board itself, with no Home Assistant and no network, and each press of a pushbutton, the usual case, toggles the relay. The step also shows how to give a single input a latching switch (`SwitchMode<n> 0`, every flip toggles the relay, so the switch never has to match the relay when Home Assistant switches it too) and how to make a single relay pulse (`PulseTime<n>`), and keeps the previous setup, `Backlog SetOption114 1; SwitchMode0 2`, as a variant with its own copy button for inputs that only report to Home Assistant. It says what each choice costs: with `SetOption114 0` Tasmota announces no inputs (`xdrv_12_discovery.ino`), so Home Assistant shows only the relays, and moving between the two removes or recreates the 16 input sensors there. Read from the firmware code; on the house board only the variant has been tried so far. The README's table and notes follow.
+
+## [2026.9.1] - 2026-09-26
+
+### Added
+
 - **Find my board**, a section of its own: it opens the board's USB port from the page, asks `Status 5` and shows the Wi-Fi and cable addresses as links to the board's own page, with its hostnames; nothing is written. A board started from 12 V before the USB went in does not listen on USB, so when there is no answer a second button restarts it through the USB-Serial-JTAG reset lines, the way the installer's console does, waits for the port to come back and asks until an address appears. Only boards with Espressif's USB id are offered. Tried on both boards, the AG8 and the A16v3: it showed their addresses.
 - **How to find a board on the network, in the FAQ**: `Status 5` in the installer's Logs & Console gives the Wi-Fi address in `IPAddress` and the cable's inside `"Ethernet"`. It also says the one condition that bites: Tasmota only takes the USB as its console when a host is there at boot (`tasmota.ino`, "Fall back to serial port, no SOF packet detected on USB port"), so a board already running from 12 V has to be restarted with the USB plugged in.
 - **Web flasher for the KinCony AG8 and the KC868-A16v3**, built on ESP Web Tools: plug the board in by USB-C, click **Install** in Chrome or Edge, and the house Tasmota build is written, after the installer asks whether to erase the flash. After flashing the installer offers Wi-Fi setup, since these builds keep Improv serial on.
@@ -22,10 +48,6 @@ The site has no version of its own: the firmware it serves is identified by the
 
 ### Changed
 
-- **The name is Tasmota KinCony**, the same in both languages: the top bar sets "KinCony" in a lighter weight instead of joining the two with "for", and the browser tab, the link preview and both READMEs follow.
-- **A16v3 inputs default to latching switches.** The Inputs step now sends `Backlog SetOption114 0; SwitchMode0 0`: every flip of a wall switch toggles its relay, which is what most houses have, and the switch position never has to match the relay when Home Assistant switches it too. A pushbutton became the per-channel exception, `SwitchMode<n> 3`. The README's table and notes follow. Two boards in a client's house were set this way on 23 October 2026, read back from the boards; the switches themselves have not been flipped yet.
-- **On a phone the top bar keeps only the name and the language switch**, since the hero already leads to the boards and the footer links the source.
-- **Each A16v3 input now drives its own relay, always.** The Inputs step sends `Backlog SetOption114 0; SwitchMode0 3`: input 1 switches relay 1 and so on, on the board itself, with no Home Assistant and no network, and each press of a pushbutton, the usual case, toggles the relay. The step also shows how to give a single input a latching switch (`SwitchMode<n> 0`, every flip toggles the relay, so the switch never has to match the relay when Home Assistant switches it too) and how to make a single relay pulse (`PulseTime<n>`), and keeps the previous setup, `Backlog SetOption114 1; SwitchMode0 2`, as a variant with its own copy button for inputs that only report to Home Assistant. It says what each choice costs: with `SetOption114 0` Tasmota announces no inputs (`xdrv_12_discovery.ino`), so Home Assistant shows only the relays, and moving between the two removes or recreates the 16 input sensors there. Read from the firmware code; on the house board only the variant has been tried so far. The README's table and notes follow.
 - **The README follows the page again.** It gains an install walkthrough, the after-flashing steps of each board as a table with what every command is for, the LED strip on `GPIO41` and why the display stays off, how to find a board on the network, and a troubleshooting section: "Disconnected" after the Wi-Fi step, a skipped Wi-Fi screen, the A16v3 that only joins a router close by without its external antenna, and "SHA-256 comparison failed". What Install and Update write moved out of the section on updating Tasmota, where it did not belong.
 - **The A16v3 template brings the LED strip.** `GPIO41`, pin 3 of the `P12` header beside the ESP32-S3, is `WS2812` (`1376`) from the first install, and a seventh step sets `Pixels 7` and `Dimmer 30`: 30% because the strip draws from the board's 5 V, the rail the ESP32 runs on. With no strip wired, the light it creates lights nothing. The `P12` pin order, `39 40 41 GND 3V3` with the square pad on `3V3`, comes from KinCony's own board drawing.
 - **The A16v3 is marked green**: 16 relays, 16 inputs and Ethernet without USB checked on the board. The FAQ entry explaining the amber mark is gone with it.
@@ -33,10 +55,8 @@ The site has no version of its own: the firmware it serves is identified by the
 - **The page follows the Tasmota blue**: a hero over the blue gradient, a section on why the published binaries do not fit these boards, one card per board with its own drawing, its feature chips and whether it has been flashed on real hardware, the three steps of an install, where the firmware comes from, and a FAQ. Light and dark themes both, one column on a phone, and every command copyable in one click.
 - **The page states what installing does**: it writes the whole factory image at offset 0, and on a board coming from another firmware the installer asks first whether to erase, with the box unticked, which the page says to tick coming from KCS. A board already on one of these builds is updated without erasing, from the page or by an ordinary OTA of the plain `.bin`.
 
-
 ### Fixed
 
-- **The page scrolled sideways on a phone.** The board cards asked for at least 330 px, wider than a 360 px screen leaves after its margins; they now shrink to the screen.
 - **Find my board showed its second button and an empty result box from the start.** `.btn` and the result box set their own `display`, which beats the browser's rule for the `hidden` attribute, so hiding them did nothing. A `.finder [hidden]` rule puts it back: the restart button now only appears when the board does not answer.
 - **The A16v3 template leaves the display off, and says why.** For a few hours on 25 September it marked `GPIO45` as Option A3, which Tasmota needs before it starts its display driver (`xdsp_17_universal.ino:72`). The display then takes a power slot of its own (`xdrv_13_display.ino`, `UpdateDevicesPresent(1)`): after the 16 relays it became power 17, the strip light moved to 18 and stopped answering in Home Assistant, as seen on the board. The mark is gone again, step 2 explains the trade-off and how to turn the display on for a board without the strip, and the optional `autoexec.be` that wrote the addresses on the display is withdrawn with it. The note under the two files no longer promises a screen `display.ini` alone cannot give.
 - **"Disconnected" right after the Wi-Fi step looked like a failure.** Tasmota restarts to join the network as soon as Improv hands it the Wi-Fi (`xdrv_62_improv.ino`, "Set SSID and Password and restart"), and these boards expose USB straight from the ESP32-S3, so the restart makes the port vanish from the browser. The Wi-Fi step now says so: the network is already saved, wait 20 seconds and look for the board on the router or in Home Assistant.
@@ -55,4 +75,7 @@ The site has no version of its own: the firmware it serves is identified by the
 - **Three links led to a private repository.** The two "full guide" links and the one in the footer opened only for someone with access to it. They are gone rather than promising a page the reader cannot open; the AG8 card points at Tasmota IR, which is public.
 - **What it takes to go back to KCS.** The page claimed KinCony does not publish the KCS image and that without a backup there was no way back. They do publish it, on their [forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), one zip per board and no account needed, and the file inside is a complete image with bootloader and partition table, so `write_flash 0x0` restores it. The backup still matters, for the settings, the scenes and the IR codes learned into the KCS slots, which no download brings back.
 
-[Unreleased]: https://github.com/self-labs/tasmota-kincony/commits/master
+[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.2...HEAD
+[2026.10.2]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.1...v2026.10.2
+[2026.10.1]: https://github.com/self-labs/tasmota-kincony/compare/v2026.9.1...v2026.10.1
+[2026.9.1]: https://github.com/self-labs/tasmota-kincony/releases/tag/v2026.9.1

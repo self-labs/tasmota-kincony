@@ -335,6 +335,7 @@ window.I18N_PT = {
   "foot.license": `
             Firmware: Tasmota, GPL-3.0, compilado a partir do
             <a href="https://github.com/cateim/Tasmota/tree/tasmota-kincony">cateim/Tasmota</a>.
+            <br/>
             Esta página: MIT,
             <a href="https://github.com/self-labs/tasmota-kincony">self-labs/tasmota-kincony</a>.`,
   "foot.credits": `
