@@ -1,4 +1,6 @@
-# ⚡ Tasmota for KinCony
+# ⚡ Tasmota KinCony
+
+**English** | [Português (Brasil)](./README.pt-BR.md)
 
 A web flasher for the Tasmota builds made for KinCony boards. Open the page in
 Chrome or Edge, plug the board in by USB-C, and click **Install**: no Python, no
@@ -115,7 +117,7 @@ in the board's own page under **Tools → Console**.
 | Template             | `Template {...}` from the card, then `Module 0` on its own                             |
 | Ethernet             | `EthType 8`                                                                            |
 | The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1` |
-| Inputs               | `Backlog SetOption114 0; SwitchMode0 3`                                                |
+| Inputs               | `Backlog SetOption114 0; SwitchMode0 0`                                                |
 | Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                    |
 | LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                 |
 
@@ -140,20 +142,20 @@ in the board's own page under **Tools → Console**.
   written out so it also undoes the variant below. Home Assistant then shows
   the 16 relays and not the inputs, which Tasmota no longer announces
   (`xdrv_12_discovery.ino`).
-- **`SwitchMode0 3`** is for pushbuttons, the wall buttons that spring back and
-  the usual case: each press toggles the relay, and releasing does nothing.
-  Nothing toggles at boot, since the inputs are read as they are when Tasmota
-  starts (`Pcf8574AddSwitch` in `xdrv_28_pcf8574_v2.ino`) and ignored for the
-  first 4 seconds.
-- **Per channel**, and each input keeps its relay: `SwitchMode<n> 0` gives
-  input `n` a latching switch, the kind that stays where you leave it, where
-  every flip toggles the relay, so the switch position never has to match the
-  relay when Home Assistant switches it too. `PulseTime<n>` turns relay `n` off
-  by itself after a while: 1 to 111 are tenths of a second, above that it is
+- **`SwitchMode0 0`** is for latching switches, the wall switches that stay
+  where you leave them and the usual case: every flip toggles the relay, so the
+  switch position never has to match the relay when Home Assistant switches it
+  too. Nothing toggles at boot, since the inputs are read as they are when
+  Tasmota starts (`Pcf8574AddSwitch` in `xdrv_28_pcf8574_v2.ino`) and ignored
+  for the first 4 seconds.
+- **Per channel**, and each input keeps its relay: `SwitchMode<n> 3` gives
+  input `n` a pushbutton, the kind that springs back, where each press toggles
+  the relay and releasing does nothing. `PulseTime<n>` turns relay `n` off by
+  itself after a while: 1 to 111 are tenths of a second, above that it is
   seconds plus 100, and `0` removes the pulse (`SetPulseTimer` in
-  `support_tasmota.ino`). A latching switch on input 1 and four relays pulsing
-  half a second, for a gate, a door strike or an impulse relay:
-  `Backlog SwitchMode1 0; PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
+  `support_tasmota.ino`). A pushbutton on input 1 and four relays pulsing half
+  a second, for a gate, a door strike or an impulse relay:
+  `Backlog SwitchMode1 3; PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
 - **The variant, inputs for Home Assistant only**:
   `Backlog SetOption114 1; SwitchMode0 2`. The inputs stop driving the relays
   and come up as 16 binary sensors, a closed contact reading on; mode 2 is what

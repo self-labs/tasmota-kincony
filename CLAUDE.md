@@ -9,6 +9,7 @@ plain HTML in `site/`, and one workflow assembles and publishes it.
 ```text
 site/
 ├── index.html            the page, with its CSS and a few lines of JavaScript inline
+├── i18n.js               the page in Brazilian Portuguese, keyed by data-i18n
 └── manifests/
     ├── ag8.json          ESP Web Tools manifest for the AG8
     └── a16v3.json        ESP Web Tools manifest for the A16v3
@@ -68,6 +69,21 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
   4 MB one, writing the image again shrinks the filesystem back and formats
   it. `RECOGNISE_BOARDS` in the page turns recognition off if an Update is ever
   seen to lose settings.
+- **The page speaks English and Brazilian Portuguese.** English is the HTML
+  itself; every element with text carries a `data-i18n` key, and `i18n.js`
+  holds the Portuguese HTML for that key. Texts the script writes (Find my
+  board, Copy, the version line) live in `EN` inside `index.html` and under
+  `js.*` in `i18n.js`. **Changing an English text means changing its line in
+  `i18n.js` in the same commit**: a missing key falls back to English and
+  warns in the console, but an outdated one silently says the old thing.
+  Language order: the choice saved in `localStorage` (`lang`), then the
+  browser's first language (any `pt` gives `pt-BR`), then English. Commands
+  inside `<pre>` are never translated. The labels of Tasmota and of the
+  installer's dialog (Tools, Console, Update, Logs & Console, Disconnected)
+  stay in English in both languages, because that is what the board and the
+  dialog show; the page's own buttons are translated. The README has the
+  same pair, `README.md` and `README.pt-BR.md`: a change to one goes to the
+  other in the same commit.
 - **Never use em dashes or en dashes**, anywhere: page, README, commits.
 
 ## Commits

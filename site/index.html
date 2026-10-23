@@ -3,13 +3,29 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tasmota for KinCony</title>
+    <title>Tasmota KinCony</title>
     <meta
       name="description"
       content="Web flash Tasmota onto KinCony boards from the browser: 8 infrared emitters on the AG8, 32 channels on the A16v3, Ethernet on both."
     />
     <meta name="color-scheme" content="light dark" />
-    <meta property="og:title" content="Tasmota for KinCony" />
+    <!-- Language, before anything paints: the visitor's own choice first, then
+         the browser's. Any Portuguese (pt-BR, pt-PT, pt) gets pt-BR, anything
+         else English. i18n.js swaps the texts at the end of the body. -->
+    <script>
+      (() => {
+        let lang = null;
+        try {
+          lang = localStorage.getItem("lang");
+        } catch {}
+        if (lang !== "en" && lang !== "pt-BR") {
+          const nav = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+          lang = /^pt(-|$)/i.test(nav) ? "pt-BR" : "en";
+        }
+        document.documentElement.lang = lang;
+      })();
+    </script>
+    <meta property="og:title" content="Tasmota KinCony" />
     <meta
       property="og:description"
       content="Web flash Tasmota onto KinCony boards from the browser."
@@ -160,10 +176,55 @@
       nav .links a:hover {
         color: var(--blue-600);
       }
+      /* On a phone the bar keeps only the name and the language; the hero has
+         the way to the boards, and the footer the link to the source. */
       @media (max-width: 620px) {
         nav .links a.hide-sm {
           display: none;
         }
+      }
+      .brand {
+        white-space: nowrap;
+      }
+      /* One name in both languages: Tasmota is the firmware, KinCony the
+         boards, set apart by weight instead of a preposition. */
+      .brand-light {
+        font-weight: 450;
+        color: var(--muted);
+      }
+      @media (max-width: 380px) {
+        nav .wrap {
+          gap: 10px;
+        }
+        .brand {
+          font-size: 0.92rem;
+        }
+      }
+      .lang {
+        display: inline-flex;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px;
+      }
+      .lang button {
+        background: transparent;
+        color: var(--muted);
+        border: 0;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .lang button[aria-pressed="true"] {
+        background: var(--blue);
+        color: #fff;
+      }
+      /* Portuguese is swapped in by script at the end of the body; until then
+         the English would flash. i18n-done is set even if the swap fails. */
+      html[lang="pt-BR"]:not(.i18n-done) body {
+        visibility: hidden;
       }
 
       /* ---------- hero ---------- */
@@ -392,7 +453,7 @@
       .boards {
         display: grid;
         gap: 22px;
-        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
       }
       .board {
         background: var(--surface);
@@ -770,13 +831,17 @@
             <rect width="200" height="200" rx="44" fill="var(--blue)" />
             <g fill="#fff" transform="translate(30,30) scale(0.8217)"><polygon points="85.19 0 0 85.19 9.73 94.93 85.19 19.47 160.65 94.93 170.38 85.19 85.19 0"/><path d="M85.19,60.08A52.6,52.6,0,0,0,66.45,161.84V146.7A38.79,38.79,0,0,1,78.31,74.5v95.88H92.08V74.5a38.79,38.79,0,0,1,11.85,72.2v15.14A52.6,52.6,0,0,0,85.19,60.08Z"/></g>
           </svg>
-          Tasmota for KinCony
+          <span>Tasmota <span class="brand-light">KinCony</span></span>
         </a>
         <div class="links">
-          <a href="#boards">Boards</a>
-          <a href="#how" class="hide-sm">How it works</a>
-          <a href="#faq" class="hide-sm">FAQ</a>
-          <a href="https://github.com/self-labs/tasmota-kincony">GitHub</a>
+          <a href="#boards" class="hide-sm" data-i18n="nav.boards">Boards</a>
+          <a href="#how" class="hide-sm" data-i18n="nav.how">How it works</a>
+          <a href="#faq" class="hide-sm" data-i18n="nav.faq">FAQ</a>
+          <a href="https://github.com/self-labs/tasmota-kincony" class="hide-sm">GitHub</a>
+          <div class="lang" role="group" aria-label="Language / Idioma">
+            <button type="button" data-lang="en" lang="en" aria-pressed="true">EN</button>
+            <button type="button" data-lang="pt-BR" lang="pt-BR" aria-pressed="false">PT</button>
+          </div>
         </div>
       </div>
     </nav>
@@ -792,8 +857,8 @@
         <path d="M172.7 327.3A180 180 0 0 1 172.7 72.7" stroke-width="3.5" stroke-linecap="round" opacity=".25" />
       </svg>
       <div class="wrap">
-        <h1>Tasmota on your KinCony board, from the browser</h1>
-        <p class="sub">
+        <h1 data-i18n="hero.title">Tasmota on your KinCony board, from the browser</h1>
+        <p class="sub" data-i18n="hero.sub">
           Plug the board in with a USB-C cable and click install. No Python, no
           esptool, no PlatformIO, and no build to set up: these are the builds
           the official Tasmota installer does not have, for boards it does not
@@ -804,29 +869,29 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            2 boards
+            <span data-i18n="hero.pill.boards">2 boards</span>
           </span>
           <span class="pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Wi-Fi set up in the browser
+            <span data-i18n="hero.pill.wifi">Wi-Fi set up in the browser</span>
           </span>
           <span class="pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3Z" stroke-linejoin="round" />
             </svg>
-            GPL-3.0 firmware, public source
+            <span data-i18n="hero.pill.gpl">GPL-3.0 firmware, public source</span>
           </span>
         </div>
         <div class="cta">
           <a class="btn btn-light" href="#boards">
-            Choose a board
+            <span data-i18n="hero.cta.choose">Choose a board</span>
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="m9 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </a>
-          <a class="btn btn-ghost" href="#why">Why not the official installer</a>
+          <a class="btn btn-ghost" href="#why" data-i18n="hero.cta.why">Why not the official installer</a>
         </div>
       </div>
     </header>
@@ -834,9 +899,9 @@
     <main class="wrap">
       <section id="why">
         <div class="section-head">
-          <div class="eyebrow">Why this exists</div>
-          <h2>The published binaries do not fit these boards</h2>
-          <p>
+          <div class="eyebrow" data-i18n="why.eyebrow">Why this exists</div>
+          <h2 data-i18n="why.title">The published binaries do not fit these boards</h2>
+          <p data-i18n="why.lead">
             Each of these three gaps is enough to leave a board half dead, and
             two of them fail without a single error message.
           </p>
@@ -850,8 +915,8 @@
                 <circle cx="12" cy="18.5" r="1.6" fill="currentColor" stroke="none" />
               </svg>
             </div>
-            <h3>The full IR driver</h3>
-            <p>
+            <h3 data-i18n="why.ir.title">The full IR driver</h3>
+            <p data-i18n="why.ir.text">
               The standard ESP32-S3 build has the basic one, which cannot pick
               an emitter: eight terminals behave as one. The IR preset has the
               full driver but drops 97 features to fit a 4 MB chip, SPI among
@@ -865,8 +930,8 @@
                 <path d="M8 7V5m8 2V5M8 19v-2m8 2v-2" stroke-linecap="round" />
               </svg>
             </div>
-            <h3>The PCF8574 expanders</h3>
-            <p>
+            <h3 data-i18n="why.pcf.title">The PCF8574 expanders</h3>
+            <p data-i18n="why.pcf.text">
               The 16 relays and 16 inputs of the A16v3 sit behind I2C
               expanders, and that driver is commented out in every official
               build. The board boots with nothing to switch.
@@ -878,8 +943,8 @@
                 <path d="M13 3 5 13h6l-1 8 8-10h-6l1-8Z" stroke-linejoin="round" />
               </svg>
             </div>
-            <h3>Ethernet without a USB cable</h3>
-            <p>
+            <h3 data-i18n="why.eth.title">Ethernet without a USB cable</h3>
+            <p data-i18n="why.eth.text">
               The W5500 of both boards shares two pins with the serial console.
               Without a USB host the console takes them and the link never
               comes up. The fix is in these builds, and was accepted upstream.
@@ -890,9 +955,9 @@
 
       <section id="boards">
         <div class="section-head">
-          <div class="eyebrow">Install</div>
-          <h2>Pick your board</h2>
-          <p>
+          <div class="eyebrow" data-i18n="boards.eyebrow">Install</div>
+          <h2 data-i18n="boards.title">Pick your board</h2>
+          <p data-i18n="boards.lead">
             Chrome or Edge on a desktop computer. Web Serial, which the
             installer needs, does not exist on Firefox, Safari, Android or iOS.
           </p>
@@ -919,47 +984,47 @@
               </svg>
               <div style="padding-bottom: 20px">
                 <h3>KinCony AG8</h3>
-                <div class="tagline">Infrared hub, ESP32-S3</div>
+                <div class="tagline" data-i18n="ag8.tagline">Infrared hub, ESP32-S3</div>
               </div>
             </div>
             <div class="body">
               <div class="chips">
-                <span class="chip key">8 IR emitters</span>
-                <span class="chip key">IR receiver</span>
-                <span class="chip key">air conditioners</span>
-                <span class="chip">W5500 Ethernet</span>
-                <span class="chip">RS485 and RS232</span>
-                <span class="chip">Modbus and TCP bridge</span>
+                <span class="chip key" data-i18n="ag8.chip.emitters">8 IR emitters</span>
+                <span class="chip key" data-i18n="ag8.chip.receiver">IR receiver</span>
+                <span class="chip key" data-i18n="ag8.chip.ac">air conditioners</span>
+                <span class="chip" data-i18n="chip.eth">W5500 Ethernet</span>
+                <span class="chip" data-i18n="ag8.chip.serial">RS485 and RS232</span>
+                <span class="chip" data-i18n="ag8.chip.modbus">Modbus and TCP bridge</span>
                 <span class="chip">1-Wire</span>
                 <span class="chip">MAX31865</span>
               </div>
-              <p class="lead">
+              <p class="lead" data-i18n="ag8.lead">
                 A command chooses which of the eight emitters it leaves
                 through, and air conditioner frames are built by the firmware
                 from vendor, mode, temperature, fan and vane.
               </p>
-              <span class="status"><span class="dot"></span> Running here since September 2026, Ethernet with no USB cable</span>
+              <span class="status"><span class="dot"></span> <span data-i18n="ag8.status">Running here since September 2026, Ethernet with no USB cable</span></span>
               <esp-web-install-button manifest="manifests/ag8.json">
                 <button slot="activate">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                  Install on the AG8
+                  <span data-i18n="ag8.install">Install on the AG8</span>
                 </button>
-                <span slot="unsupported">Use Chrome or Edge on a desktop to flash.</span>
-                <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
+                <span slot="unsupported" data-i18n="install.unsupported">Use Chrome or Edge on a desktop to flash.</span>
+                <span slot="not-allowed" data-i18n="install.notAllowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary>After flashing, six steps</summary>
-                <p class="where">
+                <summary data-i18n="ag8.steps">After flashing, six steps</summary>
+                <p class="where" data-i18n="steps.where">
                   Every command below goes in the board's own page:
                   <strong>Tools → Console</strong>. Paste it, press Enter.
                 </p>
                 <ol>
                   <li>
-                    <strong>Wi-Fi.</strong> Right after flashing, the installer
-                    asks for your network: fill it in and you are done here.
-                    <ul class="why">
+                    <span data-i18n="step.wifi"><strong>Wi-Fi.</strong> Right after flashing, the installer
+                    asks for your network: fill it in and you are done here.</span>
+                    <ul class="why" data-i18n="step.wifi.why">
                       <li>
                         Skipped that screen? With no Wi-Fi saved, the board
                         opens a network of its own, <code>tasmota-XXXX</code>.
@@ -979,9 +1044,9 @@
                     </ul>
                   </li>
                   <li>
-                    <strong>Template.</strong> Send this first, then
+                    <span data-i18n="step.template"><strong>Template.</strong> Send this first, then
                     <code>Module 0</code> as a second command. The board
-                    restarts after <code>Module 0</code>.
+                    restarts after <code>Module 0</code>.</span>
                     <div class="code">
                       <pre id="ag8-template">Template {"NAME":"KinCony AG8","GPIO":[0,5536,5600,0,0,0,0,0,0,1056,1057,1058,1059,1060,1061,0,0,0,0,0,0,1062,0,0,0,0,0,0,0,0,5568,736,704,672,0,0,1063,1088],"FLAG":0,"BASE":1}</pre>
                       <button class="copy-btn" data-copy="ag8-template">Copy</button>
@@ -992,43 +1057,43 @@
                     </div>
                   </li>
                   <li>
-                    <strong>Ethernet.</strong> <code>8</code> is the W5500 chip
+                    <span data-i18n="step.eth"><strong>Ethernet.</strong> <code>8</code> is the W5500 chip
                     on this board. It restarts by itself, and after that the
-                    cable works without USB.
+                    cable works without USB.</span>
                     <div class="code">
                       <pre id="ag8-eth">EthType 8</pre>
                       <button class="copy-btn" data-copy="ag8-eth">Copy</button>
                     </div>
                   </li>
                   <li>
-                    <strong>Learning any remote.</strong> Without this, a remote
+                    <span data-i18n="ag8.step.ir"><strong>Learning any remote.</strong> Without this, a remote
                     whose protocol Tasmota does not know is ignored; with it,
-                    its raw timings come through and can be learned.
+                    its raw timings come through and can be learned.</span>
                     <div class="code">
                       <pre id="ag8-ir">SetOption58 1</pre>
                       <button class="copy-btn" data-copy="ag8-ir">Copy</button>
                     </div>
                   </li>
                   <li>
-                    <strong>Protection and clock.</strong> One line, three
-                    settings:
+                    <span data-i18n="step.protect"><strong>Protection and clock.</strong> One line, three
+                    settings:</span>
                     <div class="code">
                       <pre id="ag8-protect">Backlog SetOption65 1; SetOption36 0; Timezone -3</pre>
                       <button class="copy-btn" data-copy="ag8-protect">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="step.protect.why">
                       <li><code>SetOption65 1</code>: seven quick power cycles no longer erase every setting.</li>
                       <li><code>SetOption36 0</code>: five or six quick restarts no longer clear the template and the module.</li>
                       <li><code>Timezone -3</code>: Brazil time. Tasmota ships at UTC+1; put your own offset instead of <code>-3</code>.</li>
                     </ul>
                   </li>
-                  <li>
+                  <li data-i18n="ag8.step.ha">
                     <strong>Home Assistant.</strong> Add
                     <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>
                     from HACS: learned keys become buttons, air conditioners become climate entities.
                   </li>
                 </ol>
-                <p style="font-size: 0.88rem; color: var(--muted)">
+                <p style="font-size: 0.88rem; color: var(--muted)" data-i18n="ag8.foot">
                   The infrared side of this board is handled by
                   <a href="https://github.com/self-labs/tasmota-ir">Tasmota IR</a>,
                   which has its own documentation.
@@ -1058,46 +1123,46 @@
               </svg>
               <div style="padding-bottom: 20px">
                 <h3>KC868-A16v3</h3>
-                <div class="tagline">16 relays, ESP32-S3</div>
+                <div class="tagline" data-i18n="a16.tagline">16 relays, ESP32-S3</div>
               </div>
             </div>
             <div class="body">
               <div class="chips">
-                <span class="chip key">16 relays</span>
-                <span class="chip key">16 inputs</span>
-                <span class="chip key">4 analog inputs</span>
-                <span class="chip">W5500 Ethernet</span>
+                <span class="chip key" data-i18n="a16.chip.relays">16 relays</span>
+                <span class="chip key" data-i18n="a16.chip.inputs">16 inputs</span>
+                <span class="chip key" data-i18n="a16.chip.analog">4 analog inputs</span>
+                <span class="chip" data-i18n="chip.eth">W5500 Ethernet</span>
                 <span class="chip">RF 433 MHz</span>
-                <span class="chip">DS3231 clock</span>
-                <span class="chip">SSD1306 display</span>
+                <span class="chip" data-i18n="a16.chip.clock">DS3231 clock</span>
+                <span class="chip" data-i18n="a16.chip.display">SSD1306 display</span>
                 <span class="chip">RS485</span>
               </div>
-              <p class="lead">
+              <p class="lead" data-i18n="a16.lead">
                 The PCF8574 driver for the 32 channels, which no official build
                 carries, next to the clock, the display and the bridges.
               </p>
-              <span class="status"><span class="dot"></span> Running here since September 2026: 16 relays, 16 inputs, Ethernet with no USB cable</span>
+              <span class="status"><span class="dot"></span> <span data-i18n="a16.status">Running here since September 2026: 16 relays, 16 inputs, Ethernet with no USB cable</span></span>
               <esp-web-install-button manifest="manifests/a16v3.json">
                 <button slot="activate">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                  Install on the A16v3
+                  <span data-i18n="a16.install">Install on the A16v3</span>
                 </button>
-                <span slot="unsupported">Use Chrome or Edge on a desktop to flash.</span>
-                <span slot="not-allowed">Web Serial needs HTTPS or localhost.</span>
+                <span slot="unsupported" data-i18n="install.unsupported">Use Chrome or Edge on a desktop to flash.</span>
+                <span slot="not-allowed" data-i18n="install.notAllowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary>After flashing, seven steps</summary>
-                <p class="where">
+                <summary data-i18n="a16.steps">After flashing, seven steps</summary>
+                <p class="where" data-i18n="steps.where">
                   Every command below goes in the board's own page:
                   <strong>Tools → Console</strong>. Paste it, press Enter.
                 </p>
                 <ol>
                   <li>
-                    <strong>Wi-Fi.</strong> Right after flashing, the installer
-                    asks for your network: fill it in and you are done here.
-                    <ul class="why">
+                    <span data-i18n="step.wifi"><strong>Wi-Fi.</strong> Right after flashing, the installer
+                    asks for your network: fill it in and you are done here.</span>
+                    <ul class="why" data-i18n="step.wifi.why">
                       <li>
                         Skipped that screen? With no Wi-Fi saved, the board
                         opens a network of its own, <code>tasmota-XXXX</code>.
@@ -1117,9 +1182,9 @@
                     </ul>
                   </li>
                   <li>
-                    <strong>Template.</strong> Send this first, then
+                    <span data-i18n="step.template"><strong>Template.</strong> Send this first, then
                     <code>Module 0</code> as a second command. The board
-                    restarts after <code>Module 0</code>.
+                    restarts after <code>Module 0</code>.</span>
                     <div class="code">
                       <pre id="a16-template">Template {"NAME":"KinCony A16v3","GPIO":[0,5536,5600,0,4704,4707,4705,4706,1152,640,608,0,0,0,0,5568,9408,9440,1120,0,0,0,0,0,0,0,0,1314,0,0,1376,736,704,672,0,0,1312,1313],"FLAG":0,"BASE":1}</pre>
                       <button class="copy-btn" data-copy="a16-template">Copy</button>
@@ -1128,46 +1193,46 @@
                       <pre id="a16-module">Module 0</pre>
                       <button class="copy-btn" data-copy="a16-module">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="a16.step.template.why">
                       <li>The template already puts a WS2812 LED strip on <code>GPIO41</code>, pin 3 of the <code>P12</code> header beside the ESP32-S3 (<code>39 40 41 GND 3V3</code>). With no strip wired there, the light it creates simply lights nothing.</li>
                       <li>The display stays off on purpose. Turning it on takes an <em>Option A3</em> mark in the template, and the display then claims a power slot of its own: after the 16 relays it becomes power 17, the strip light moves to 18 and stops answering in Home Assistant. On a board without the strip, mark <code>GPIO45</code> as <code>6210</code> and the display comes on.</li>
                     </ul>
                   </li>
                   <li>
-                    <strong>Ethernet.</strong> <code>8</code> is the W5500 chip
+                    <span data-i18n="step.eth"><strong>Ethernet.</strong> <code>8</code> is the W5500 chip
                     on this board. It restarts by itself, and after that the
-                    cable works without USB.
+                    cable works without USB.</span>
                     <div class="code">
                       <pre id="a16-eth">EthType 8</pre>
                       <button class="copy-btn" data-copy="a16-eth">Copy</button>
                     </div>
                   </li>
                   <li>
-                    <strong>The two files.</strong> Download
+                    <span data-i18n="a16.step.files"><strong>The two files.</strong> Download
                     <a href="files/pcf8574.dat" download><code>pcf8574.dat</code></a>
                     and
                     <a href="files/display.ini" download><code>display.ini</code></a>,
                     upload both under <strong>Tools → Manage File system</strong>,
-                    then restart:
+                    then restart:</span>
                     <div class="code">
                       <pre id="a16-restart">Restart 1</pre>
                       <button class="copy-btn" data-copy="a16-restart">Copy</button>
                     </div>
                   </li>
                   <li>
-                    <strong>Inputs.</strong> Each input drives the relay with
-                    the same number, always. One line, two settings:
+                    <span data-i18n="a16.step.inputs"><strong>Inputs.</strong> Each input drives the relay with
+                    the same number, always. One line, two settings:</span>
                     <div class="code">
-                      <pre id="a16-inputs">Backlog SetOption114 0; SwitchMode0 3</pre>
+                      <pre id="a16-inputs">Backlog SetOption114 0; SwitchMode0 0</pre>
                       <button class="copy-btn" data-copy="a16-inputs">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="a16.step.inputs.why">
                       <li><code>SetOption114 0</code>: input 1 switches relay 1, and so on up to 16, on the board itself, with no Home Assistant and no network. It is Tasmota's default, written out so it also undoes the variant below.</li>
-                      <li><code>SwitchMode0 3</code>: for pushbuttons, the wall buttons that spring back, the usual case. Each press toggles the relay; releasing does nothing.</li>
-                      <li>Latching switches and pulsing outputs are set per channel, and the input keeps its relay. <code>SwitchMode1 0</code> gives input 1 a latching switch, the kind that stays where you leave it: every flip toggles the relay, so the switch position never has to match the relay when Home Assistant switches it too. <code>PulseTime13 5</code> turns relay 13 off by itself after 0.5 s: 1 to 111 are tenths of a second, above that it is seconds plus 100, and <code>0</code> removes the pulse.</li>
+                      <li><code>SwitchMode0 0</code>: for latching switches, the wall switches that stay where you leave them, the usual case. Every flip toggles the relay, so the switch position never has to match the relay when Home Assistant switches it too.</li>
+                      <li>Pushbuttons and pulsing outputs are set per channel, and the input keeps its relay. <code>SwitchMode1 3</code> gives input 1 a pushbutton, the kind that springs back: each press toggles the relay, and releasing does nothing. <code>PulseTime13 5</code> turns relay 13 off by itself after 0.5 s: 1 to 111 are tenths of a second, above that it is seconds plus 100, and <code>0</code> removes the pulse.</li>
                       <li>Home Assistant shows the 16 relays, not the inputs: with <code>SetOption114 0</code> Tasmota does not announce them.</li>
                     </ul>
-                    <p>
+                    <p data-i18n="a16.step.variant">
                       <strong>Variant: inputs for Home Assistant only.</strong>
                       The inputs stop driving the relays and show up in Home
                       Assistant as 16 binary sensors, and an automation decides
@@ -1177,39 +1242,39 @@
                       <pre id="a16-inputs-ha">Backlog SetOption114 1; SwitchMode0 2</pre>
                       <button class="copy-btn" data-copy="a16-inputs-ha">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="a16.step.variant.why">
                       <li><code>SetOption114 1</code>: closing input 1 no longer flips relay 1.</li>
                       <li><code>SwitchMode0 2</code>: a closed contact reads on. It is also what makes Home Assistant create the inputs as sensors; in mode 0 they only show up as automation triggers.</li>
                       <li>Switching between the two removes or recreates the 16 input sensors in Home Assistant, along with any area or name given to them there.</li>
                     </ul>
                   </li>
                   <li>
-                    <strong>Protection and clock.</strong> One line, three
-                    settings:
+                    <span data-i18n="step.protect"><strong>Protection and clock.</strong> One line, three
+                    settings:</span>
                     <div class="code">
                       <pre id="a16-protect">Backlog SetOption65 1; SetOption36 0; Timezone -3</pre>
                       <button class="copy-btn" data-copy="a16-protect">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="step.protect.why">
                       <li><code>SetOption65 1</code>: seven quick power cycles no longer erase every setting.</li>
                       <li><code>SetOption36 0</code>: five or six quick restarts no longer clear the template and the module.</li>
                       <li><code>Timezone -3</code>: Brazil time. Tasmota ships at UTC+1; put your own offset instead of <code>-3</code>.</li>
                     </ul>
                   </li>
                   <li>
-                    <strong>LED strip.</strong> Only with a strip on
-                    <code>GPIO41</code>. One line, two settings:
+                    <span data-i18n="a16.step.strip"><strong>LED strip.</strong> Only with a strip on
+                    <code>GPIO41</code>. One line, two settings:</span>
                     <div class="code">
                       <pre id="a16-strip">Backlog Pixels 7; Dimmer 30</pre>
                       <button class="copy-btn" data-copy="a16-strip">Copy</button>
                     </div>
-                    <ul class="why">
+                    <ul class="why" data-i18n="a16.step.strip.why">
                       <li><code>Pixels 7</code>: how many LEDs the strip has. Tasmota starts at 30; put your own count.</li>
                       <li><code>Dimmer 30</code>: 30% brightness. The strip draws from the board's 5 V, the same rail as the ESP32, so keep it low until you have measured that 5 V with the strip lit.</li>
                     </ul>
                   </li>
                 </ol>
-                <p style="font-size: 0.88rem; color: var(--muted)">
+                <p style="font-size: 0.88rem; color: var(--muted)" data-i18n="a16.foot">
                   Both files come from this repository. <code>pcf8574.dat</code>
                   turns the 32 expander pins into relays and inputs;
                   <code>display.ini</code> describes the SSD1306 and is only
@@ -1223,9 +1288,9 @@
 
       <section id="find">
         <div class="section-head">
-          <div class="eyebrow">Already flashed</div>
-          <h2>Find a board on your network</h2>
-          <p>
+          <div class="eyebrow" data-i18n="find.eyebrow">Already flashed</div>
+          <h2 data-i18n="find.title">Find a board on your network</h2>
+          <p data-i18n="find.lead">
             Plug it in by USB and let this page ask it. It answers with its
             Wi-Fi and cable addresses; nothing is written to the board.
           </p>
@@ -1236,9 +1301,9 @@
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" />
               </svg>
-              Find my board
+              <span data-i18n="find.button">Find my board</span>
             </button>
-            <button class="btn btn-find-alt" id="find-restart" type="button" hidden>
+            <button class="btn btn-find-alt" id="find-restart" type="button" hidden data-i18n="find.restart">
               Restart it over USB and ask again
             </button>
           </div>
@@ -1249,11 +1314,11 @@
               <span class="addr" id="find-wifi"></span>
             </div>
             <div class="net">
-              <span class="kind">Cable</span>
+              <span class="kind" data-i18n="find.cable">Cable</span>
               <span class="addr" id="find-eth"></span>
             </div>
           </div>
-          <p class="finder-note">
+          <p class="finder-note" data-i18n="find.note">
             Close the installer's window first: only one page can hold the
             port. A board that was already running from 12 V before the USB
             went in does not answer over USB; the second button restarts it
@@ -1268,8 +1333,8 @@
             <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           <div style="flex: 1">
-            <h2>Back the board up first</h2>
-            <p>
+            <h2 data-i18n="backup.title">Back the board up first</h2>
+            <p data-i18n="backup.p1">
               Installing writes the <strong>factory image</strong> at offset 0:
               bootloader, partition table, application and safeboot. On a board
               coming from another firmware the installer first asks whether to
@@ -1278,7 +1343,7 @@
               board boot clean, and it also erases KCS along with everything
               configured and learned inside it.
             </p>
-            <p>
+            <p data-i18n="backup.p2">
               <strong>The KCS firmware itself is not lost.</strong> KinCony
               publishes it per board on their
               <a href="https://www.kincony.com/forum/forumdisplay.php?fid=75">forum</a>,
@@ -1293,7 +1358,7 @@
               <pre id="backup">python -m esptool --chip esp32s3 --port COM3 --baud 460800 read_flash 0x0 0x1000000 backup-16MB.bin</pre>
               <button class="copy-btn" data-copy="backup">Copy</button>
             </div>
-            <p>
+            <p data-i18n="backup.p3">
               The file must be exactly 16,777,216 bytes, and
               <code>write_flash 0x0 backup-16MB.bin</code> puts the board back
               the way it came, settings and learned codes included.
@@ -1304,29 +1369,29 @@
 
       <section id="how">
         <div class="section-head">
-          <div class="eyebrow">How it works</div>
-          <h2>Three minutes, start to finish</h2>
+          <div class="eyebrow" data-i18n="how.eyebrow">How it works</div>
+          <h2 data-i18n="how.title">Three minutes, start to finish</h2>
         </div>
         <div class="flow">
           <div class="step">
-            <h3>Plug the board in</h3>
-            <p>
+            <h3 data-i18n="how.plug.title">Plug the board in</h3>
+            <p data-i18n="how.plug.text">
               USB-C, with a cable that carries data. If the board is not listed,
               hold <strong>DW</strong>, tap <strong>RST</strong>, release
               <strong>DW</strong>, and try again.
             </p>
           </div>
           <div class="step">
-            <h3>Click install</h3>
-            <p>
+            <h3 data-i18n="how.install.title">Click install</h3>
+            <p data-i18n="how.install.text">
               The browser writes the factory image straight from this page,
               asking first whether to erase the flash. Nothing is installed on
               your computer.
             </p>
           </div>
           <div class="step">
-            <h3>Join your Wi-Fi</h3>
-            <p>
+            <h3 data-i18n="how.wifi.title">Join your Wi-Fi</h3>
+            <p data-i18n="how.wifi.text">
               The installer offers to set Wi-Fi up over the same cable. From
               there the board has its own web interface, and Home Assistant
               finds it by MQTT.
@@ -1337,9 +1402,9 @@
 
       <section id="source">
         <div class="section-head">
-          <div class="eyebrow">Where the firmware comes from</div>
-          <h2>Tasmota, plus two environments</h2>
-          <p>
+          <div class="eyebrow" data-i18n="source.eyebrow">Where the firmware comes from</div>
+          <h2 data-i18n="source.title">Tasmota, plus two environments</h2>
+          <p data-i18n="source.lead">
             Both builds come from
             <a href="https://github.com/cateim/Tasmota/tree/tasmota-kincony">cateim/Tasmota</a>,
             branch <code>tasmota-kincony</code>: Tasmota itself with one
@@ -1349,16 +1414,16 @@
         </div>
         <div class="grid-3">
           <div class="tile">
-            <h3>Updating Tasmota</h3>
-            <p>
+            <h3 data-i18n="source.tasmota.title">Updating Tasmota</h3>
+            <p data-i18n="source.tasmota.text">
               Merge the upstream release into that branch and push. Only two
               files carry the changes, so that is the whole update, and the site
               picks the result up within a day.
             </p>
           </div>
           <div class="tile">
-            <h3>Updating a board</h3>
-            <p>
+            <h3 data-i18n="source.board.title">Updating a board</h3>
+            <p data-i18n="source.board.text">
               The page recognises a board that already runs one of these
               builds, by the name it announces (<code>Tasmota AG8</code>,
               <code>Tasmota A16v3</code>), and offers <strong>Update</strong>,
@@ -1370,8 +1435,8 @@
             </p>
           </div>
           <div class="tile">
-            <h3>Reading the source</h3>
-            <p>
+            <h3 data-i18n="source.read.title">Reading the source</h3>
+            <p data-i18n="source.read.text">
               Tasmota is GPL-3.0 and the branch is public, which is the complete
               source of what this page writes onto your board.
             </p>
@@ -1381,13 +1446,13 @@
 
       <section id="faq">
         <div class="section-head">
-          <div class="eyebrow">FAQ</div>
-          <h2>Before you click</h2>
+          <div class="eyebrow" data-i18n="faq.eyebrow">FAQ</div>
+          <h2 data-i18n="faq.title">Before you click</h2>
         </div>
         <div class="faq">
           <details>
-            <summary>Can I go back to the KinCony firmware?</summary>
-            <p>
+            <summary data-i18n="faq.kcs.q">Can I go back to the KinCony firmware?</summary>
+            <p data-i18n="faq.kcs.a">
               Yes, and you do not need the backup for the firmware itself.
               KinCony publishes KCS per board on their
               <a href="https://www.kincony.com/forum/forumdisplay.php?fid=75">forum</a>,
@@ -1402,16 +1467,16 @@
             </p>
           </details>
           <details>
-            <summary>Does it work from a phone or tablet?</summary>
-            <p>
+            <summary data-i18n="faq.phone.q">Does it work from a phone or tablet?</summary>
+            <p data-i18n="faq.phone.a">
               No. Flashing needs Web Serial, which only Chrome and Edge on a
               desktop have. Once the board is flashed, its web interface and
               Home Assistant work from any browser.
             </p>
           </details>
           <details>
-            <summary>Are my settings kept when I flash from here?</summary>
-            <p>
+            <summary data-i18n="faq.settings.q">Are my settings kept when I flash from here?</summary>
+            <p data-i18n="faq.settings.a">
               On a board already running one of these builds, yes: it is
               offered Update, written without erasing, and the settings are
               kept, as tested on the A16v3. Anything else, KCS included, gets
@@ -1422,8 +1487,8 @@
             </p>
           </details>
           <details>
-            <summary>Where is my board on the network?</summary>
-            <p>
+            <summary data-i18n="faq.where.q">Where is my board on the network?</summary>
+            <p data-i18n="faq.where.a">
               <a href="#find">Find my board</a>, on this page, asks it over USB
               and shows both addresses. By hand, press <strong>Install</strong>
               on the board's card, pick the port, open
@@ -1439,8 +1504,8 @@
             </p>
           </details>
           <details>
-            <summary>The serial log says "SHA-256 comparison failed". Is it broken?</summary>
-            <p>
+            <summary data-i18n="faq.sha.q">The serial log says "SHA-256 comparison failed". Is it broken?</summary>
+            <p data-i18n="faq.sha.a">
               No. The lines right after it say <code>Attempting to boot
               anyway...</code>, and the board does. The chip's ROM checks a
               SHA-256 stored at the end of the bootloader before starting it,
@@ -1460,8 +1525,8 @@
             </p>
           </details>
           <details>
-            <summary>Does the board phone home?</summary>
-            <p>
+            <summary data-i18n="faq.home.q">Does the board phone home?</summary>
+            <p data-i18n="faq.home.a">
               No. Tasmota talks to your MQTT broker and to whatever you point it
               at. The over the air update URL is deliberately left empty in
               these builds, so an accidental upgrade cannot replace them with a
@@ -1476,7 +1541,7 @@
       <div class="wrap cols">
         <div>
           <div class="version" id="version">firmware version unknown</div>
-          <p style="margin-top: 12px">
+          <p style="margin-top: 12px" data-i18n="foot.license">
             Firmware: Tasmota, GPL-3.0, built from
             <a href="https://github.com/cateim/Tasmota/tree/tasmota-kincony">cateim/Tasmota</a>.
             This page: MIT,
@@ -1484,7 +1549,7 @@
           </p>
         </div>
         <div>
-          <p>
+          <p data-i18n="foot.credits">
             Built with
             <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools</a>.
             Infrared in Home Assistant through
@@ -1495,7 +1560,63 @@
       </div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script>
+      // Language. The English lives in the HTML; the Portuguese comes from
+      // i18n.js, keyed by each element's data-i18n. Strings this script writes
+      // go through t(), with the English below and the Portuguese in the same
+      // file. A key missing from i18n.js stays in English and says so in the
+      // console.
+      const EN = {
+        "doc.description": document.querySelector('meta[name="description"]').content,
+        "js.needsDesktop": "This needs Chrome or Edge on a desktop computer.",
+        "js.notConnected": "not connected",
+        "js.found": "Found it. The addresses open the board's own page.",
+        "js.noNetwork": "The board answered, but it is on no network yet. Type WifiConfig 2 in the installer's console to open its own Wi-Fi for 3 minutes.",
+        "js.busy": "The port is busy. Close the installer's window, or any other page using it, and try again.",
+        "js.asking": "Asking the board...",
+        "js.noAnswer": "No answer. The board probably started before the USB went in, and then it does not listen on USB.",
+        "js.restarting": "Restarting the board...",
+        "js.waitingBack": "Waiting for the board to come back...",
+        "js.notBack": "The board did not come back on USB. Unplug the USB, plug it back in and press Find my board again.",
+        "js.waitingNet": "Waiting for its network...",
+        "js.stillNoAnswer": "Still no answer. Open the installer's Logs & Console to see what the board is saying.",
+        "js.copy": "Copy",
+        "js.copied": "Copied",
+        "js.selectCopy": "Select and copy",
+        "js.versionUnknown": "firmware version unknown",
+      };
+      const PT = window.I18N_PT || {};
+      const english = new Map();
+      document.querySelectorAll("[data-i18n]").forEach((el) => english.set(el, el.innerHTML));
+      let lang = document.documentElement.lang === "pt-BR" ? "pt-BR" : "en";
+      const t = (key) => (lang === "pt-BR" && PT[key]) || EN[key] || key;
+      const onLang = [];
+
+      function setLang(next, remember) {
+        lang = next;
+        document.documentElement.lang = next;
+        english.forEach((html, el) => {
+          const key = el.dataset.i18n;
+          if (next === "pt-BR" && !PT[key]) console.warn("i18n: no pt-BR text for", key);
+          el.innerHTML = next === "pt-BR" && PT[key] ? PT[key] : html;
+        });
+        document.querySelector('meta[name="description"]').content = t("doc.description");
+        document.querySelectorAll(".lang button").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.lang === next));
+        });
+        onLang.forEach((fn) => fn());
+        if (remember) {
+          try {
+            localStorage.setItem("lang", next);
+          } catch {}
+        }
+      }
+
+      document.querySelectorAll(".lang button").forEach((button) => {
+        button.addEventListener("click", () => setLang(button.dataset.lang, true));
+      });
+
       // Find a board on the network: ask it "Status 5" over USB and show the
       // Wi-Fi and cable addresses from the answer. Tasmota only takes the USB
       // as its console when a host was there at boot (tasmota.ino, "no SOF
@@ -1509,11 +1630,22 @@
         const resultEl = document.getElementById("find-result");
         const ESPRESSIF = 0x303a;
         const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-        const say = (text) => (statusEl.textContent = text);
+        // Messages are kept by key, so a language switch rewrites the one on
+        // screen, and the addresses with it.
+        let lastSaid = null;
+        let lastNet = null;
+        const say = (key) => {
+          lastSaid = key;
+          statusEl.textContent = t(key);
+        };
+        onLang.push(() => {
+          if (lastNet && !resultEl.hidden) show(lastNet);
+          else if (lastSaid) say(lastSaid);
+        });
 
         if (!("serial" in navigator)) {
           findBtn.disabled = true;
-          say("This needs Chrome or Edge on a desktop computer.");
+          say("js.needsDesktop");
           return;
         }
 
@@ -1535,7 +1667,7 @@
         function address(ip, host) {
           const box = document.createElement("span");
           if (!ip || ip === "0.0.0.0") {
-            box.textContent = "not connected";
+            box.textContent = t("js.notConnected");
             return box;
           }
           const link = document.createElement("a");
@@ -1553,16 +1685,13 @@
         }
 
         function show(net) {
+          lastNet = net;
           const eth = net.Ethernet || {};
           document.getElementById("find-wifi").replaceChildren(address(net.IPAddress, net.Hostname));
           document.getElementById("find-eth").replaceChildren(address(eth.IPAddress, eth.Hostname));
           resultEl.hidden = false;
           const online = [net.IPAddress, eth.IPAddress].some((ip) => ip && ip !== "0.0.0.0");
-          say(
-            online
-              ? "Found it. The addresses open the board's own page."
-              : "The board answered, but it is on no network yet. Type WifiConfig 2 in the installer's console to open its own Wi-Fi for 3 minutes."
-          );
+          say(online ? "js.found" : "js.noNetwork");
         }
 
         // Ask "Status 5" until an answer arrives or time runs out. After a
@@ -1611,7 +1740,7 @@
             await port.open({ baudRate: 115200 });
             return true;
           } catch {
-            say("The port is busy. Close the installer's window, or any other page using it, and try again.");
+            say("js.busy");
             return false;
           }
         }
@@ -1627,13 +1756,13 @@
             return; // the chooser was closed
           }
           if (!(await openPort(chosen))) return;
-          say("Asking the board...");
+          say("js.asking");
           const net = await ask(chosen, 4000, false);
           await chosen.close().catch(() => {});
           if (net) {
             show(net);
           } else {
-            say("No answer. The board probably started before the USB went in, and then it does not listen on USB.");
+            say("js.noAnswer");
             restartBtn.hidden = false;
           }
         });
@@ -1641,7 +1770,7 @@
         restartBtn.addEventListener("click", async () => {
           if (!chosen || !(await openPort(chosen))) return;
           restartBtn.hidden = true;
-          say("Restarting the board...");
+          say("js.restarting");
           const info = chosen.getInfo();
           // RTS up with DTR down holds the chip in reset; releasing RTS starts it.
           await chosen.setSignals({ dataTerminalReady: false, requestToSend: true }).catch(() => {});
@@ -1649,7 +1778,7 @@
           await chosen.setSignals({ dataTerminalReady: false, requestToSend: false }).catch(() => {});
           await chosen.close().catch(() => {});
           // The ESP32-S3 serves USB itself, so the port vanishes and comes back.
-          say("Waiting for the board to come back...");
+          say("js.waitingBack");
           let port = null;
           for (let i = 0; i < 40 && !port; i++) {
             await sleep(500);
@@ -1667,30 +1796,32 @@
             }
           }
           if (!port) {
-            say("The board did not come back on USB. Unplug the USB, plug it back in and press Find my board again.");
+            say("js.notBack");
             return;
           }
           chosen = port;
-          say("Waiting for its network...");
+          say("js.waitingNet");
           const net = await ask(port, 25000, true);
           await port.close().catch(() => {});
           if (net) show(net);
-          else say("Still no answer. Open the installer's Logs & Console to see what the board is saying.");
+          else say("js.stillNoAnswer");
         });
       })();
 
-      document.querySelectorAll("button.copy-btn").forEach((button) => {
+      const copyButtons = document.querySelectorAll("button.copy-btn");
+      copyButtons.forEach((button) => {
         button.addEventListener("click", async () => {
           const text = document.getElementById(button.dataset.copy).textContent;
           try {
             await navigator.clipboard.writeText(text);
-            button.textContent = "Copied";
+            button.textContent = t("js.copied");
           } catch {
-            button.textContent = "Select and copy";
+            button.textContent = t("js.selectCopy");
           }
-          setTimeout(() => (button.textContent = "Copy"), 2000);
+          setTimeout(() => (button.textContent = t("js.copy")), 2000);
         });
       });
+      onLang.push(() => copyButtons.forEach((button) => (button.textContent = t("js.copy"))));
       // ESP Web Tools recognises a board as already running this firmware
       // only when its Improv name equals manifest.name. The manifests keep a
       // descriptive name for the dialog and say in "improv_firmware" what the
@@ -1718,8 +1849,13 @@
 
       // "Tasmota 15.6.0.1" says what is installed; the release tag next to
       // it says exactly which build, and links to its source and binaries.
+      let versionKnown = false;
+      onLang.push(() => {
+        if (!versionKnown) document.getElementById("version").textContent = t("js.versionUnknown");
+      });
       function renderVersion(manifest) {
         if (!manifest.tasmota || !manifest.version || manifest.version === "dev") return;
+        versionKnown = true;
         const badge = document.getElementById("version");
         badge.textContent = "Tasmota " + manifest.tasmota + " \u00b7 ";
         const link = document.createElement("a");
@@ -1731,6 +1867,15 @@
         .then((response) => response.json())
         .then(renderVersion)
         .catch(() => {});
+
+      // The page starts in English; switch now if the visitor's language is
+      // Portuguese. The body is hidden until this runs, so it shows either way.
+      try {
+        if (lang === "pt-BR") setLang("pt-BR", false);
+        else setLang("en", false);
+      } finally {
+        document.documentElement.classList.add("i18n-done");
+      }
     </script>
   </body>
 </html>
