@@ -147,21 +147,31 @@ window.I18N_PT = {
                     <a href="files/display.ini" download><code>display.ini</code></a>,
                     envie os dois em <strong>Tools → Manage File system</strong>
                     e reinicie:`,
-  "a16.step.inputs": `<strong>Entradas.</strong> Cada entrada comanda o relé de
-                    mesmo número, sempre. Uma linha, dois ajustes:`,
+  "a16.step.inputs": `<strong>Entradas.</strong> Cada entrada inverte o relé de
+                    mesmo número, na própria placa, e as 16 aparecem no Home
+                    Assistant ao lado dos relés. Uma linha de ajustes, depois
+                    cada regra numa linha só dela, e depois uma linha que liga
+                    as duas regras:`,
   "a16.step.inputs.why": `
-                      <li><code>SetOption114 0</code>: a entrada 1 aciona o relé 1, e assim até a 16, na própria placa, sem Home Assistant e sem rede. É o padrão do Tasmota, escrito por extenso para também desfazer a variante abaixo.</li>
-                      <li><code>SwitchMode0 0</code>: para interruptores, as teclas de parede que ficam na posição, o caso mais comum. Cada virada inverte o relé, então a posição da tecla nunca precisa bater com o relé quando o Home Assistant também o aciona.</li>
-                      <li>Pulsadores e saídas com pulso se ajustam por canal, e a entrada continua com o seu relé. <code>SwitchMode1 3</code> põe um pulsador na entrada 1, o botão que volta sozinho: cada aperto inverte o relé, e soltar não faz nada. <code>PulseTime13 5</code> desliga o relé 13 sozinho depois de 0,5 s: de 1 a 111 são décimos de segundo, acima disso são segundos mais 100, e <code>0</code> tira o pulso.</li>
-                      <li>O Home Assistant mostra os 16 relés, e não as entradas: com <code>SetOption114 0</code> o Tasmota não as anuncia.</li>`,
+                      <li><code>SetOption114 1</code>: a entrada não aciona mais o relé sozinha. Cada mudança continua chegando às regras e sai na hora, e o Tasmota anuncia as entradas, então o Home Assistant as cria como sensores binários.</li>
+                      <li><code>SwitchMode0 2</code>: contato fechado é ligado e aberto é desligado. Uma regra sem valor, como <code>Switch1#State</code>, atende os dois, então cada virada da tecla de parede inverte o relé, e a posição da tecla nunca precisa bater com o relé quando o Home Assistant também o aciona. No modo 0, o Home Assistant só ofereceria as entradas como gatilhos de automação.</li>
+                      <li>As regras moram na placa e rodam nela, sem Home Assistant e sem rede, e nada inverte sozinho no boot: as entradas são lidas como estão quando o Tasmota inicia e ignoradas nos primeiros 4 segundos. Mande cada regra numa linha só dela, nunca dentro de um <code>Backlog</code>, que separa os comandos pelo <code>;</code>. Elas ocupam 319 e 333 dos 511 caracteres que cabem numa regra, e a <code>Rule3</code> fica livre para o que mais a casa precisar.</li>
+                      <li>Por canal, troque o pedaço daquela entrada e mande a regra inteira de novo: outro relé é outro número depois do <code>Power</code>; um pulsador, o botão que volta sozinho, continua no modo 2 e usa <code>Switch3#State=1</code>, o aperto; uma entrada que só informa o Home Assistant, ou uma livre, sai da regra. <code>PulseTime13 5</code> desliga o relé 13 sozinho depois de 0,5 s: de 1 a 111 são décimos de segundo, acima disso são segundos mais 100, e <code>0</code> tira o pulso.</li>`,
+  "a16.step.names": `
+                      <strong>Opcional: nomes das entradas.</strong> O Home
+                      Assistant mostra as entradas como <code>Switch1</code> a
+                      <code>Switch16</code>. Para ver <code>IN1</code> a
+                      <code>IN16</code>, mande isto antes de a placa entrar no
+                      Home Assistant, porque o ID da entidade nasce do primeiro
+                      nome. As regras continuam chamando as entradas de
+                      <code>Switch1</code> a <code>Switch16</code>:`,
   "a16.step.variant": `
-                      <strong>Variante: entradas só para o Home Assistant.</strong>
-                      As entradas param de acionar os relés e aparecem no Home
-                      Assistant como 16 sensores binários, e uma automação
-                      decide o que cada uma faz:`,
+                      <strong>Variante: sem regras.</strong> O próprio Tasmota
+                      liga cada entrada ao seu relé, e o Home Assistant mostra só
+                      os relés:`,
   "a16.step.variant.why": `
-                      <li><code>SetOption114 1</code>: fechar a entrada 1 não inverte mais o relé 1.</li>
-                      <li><code>SwitchMode0 2</code>: contato fechado é ligado. É também o que faz o Home Assistant criar as entradas como sensores; no modo 0 elas só aparecem como gatilhos de automação.</li>
+                      <li><code>SetOption114 0</code>: a entrada 1 aciona o relé 1, e assim até a 16, na própria placa, e o Tasmota deixa de anunciar as entradas. <code>SwitchMode0 0</code> é para interruptores; <code>SwitchMode1 3</code> põe um pulsador na entrada 1.</li>
+                      <li><code>Rule1 0; Rule2 0</code>: as duas regras ficam desligadas, não apagadas.</li>
                       <li>Trocar entre as duas remove ou recria os 16 sensores de entrada no Home Assistant, junto com qualquer área ou nome dado a eles lá.</li>`,
   "a16.step.strip": `<strong>Fita de LED.</strong> Só com uma fita no
                     <code>GPIO41</code>. Uma linha, dois ajustes:`,

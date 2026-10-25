@@ -117,7 +117,7 @@ in the board's own page under **Tools → Console**.
 | Template             | `Template {...}` from the card, then `Module 0` on its own                             |
 | Ethernet             | `EthType 8`                                                                            |
 | The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1` |
-| Inputs               | `Backlog SetOption114 0; SwitchMode0 0`                                                |
+| Inputs               | `Backlog SetOption114 1; SwitchMode0 2`, then `Rule1` and `Rule2` from the card, each on its own, then `Backlog Rule1 1; Rule2 1` |
 | Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                    |
 | LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                 |
 
@@ -136,32 +136,50 @@ in the board's own page under **Tools → Console**.
   boards come back from it with no relays and no Ethernet.
 - **`Timezone`**: Tasmota ships set to UTC+1 (`APP_TIMEZONE 1`). `-3` is
   Brazil; put your own offset.
-- **`SetOption114 0`** makes each A16v3 input drive the relay with the same
-  number, always, on the board itself, so a wall button works with no Home
-  Assistant and no network (`support_switch_v4.ino`). It is Tasmota's default,
-  written out so it also undoes the variant below. Home Assistant then shows
-  the 16 relays and not the inputs, which Tasmota no longer announces
-  (`xdrv_12_discovery.ino`).
-- **`SwitchMode0 0`** is for latching switches, the wall switches that stay
-  where you leave them and the usual case: every flip toggles the relay, so the
-  switch position never has to match the relay when Home Assistant switches it
-  too. Nothing toggles at boot, since the inputs are read as they are when
-  Tasmota starts (`Pcf8574AddSwitch` in `xdrv_28_pcf8574_v2.ino`) and ignored
-  for the first 4 seconds.
-- **Per channel**, and each input keeps its relay: `SwitchMode<n> 3` gives
-  input `n` a pushbutton, the kind that springs back, where each press toggles
-  the relay and releasing does nothing. `PulseTime<n>` turns relay `n` off by
-  itself after a while: 1 to 111 are tenths of a second, above that it is
-  seconds plus 100, and `0` removes the pulse (`SetPulseTimer` in
-  `support_tasmota.ino`). A pushbutton on input 1 and four relays pulsing half
-  a second, for a gate, a door strike or an impulse relay:
-  `Backlog SwitchMode1 3; PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
-- **The variant, inputs for Home Assistant only**:
-  `Backlog SetOption114 1; SwitchMode0 2`. The inputs stop driving the relays
-  and come up as 16 binary sensors, a closed contact reading on; mode 2 is what
-  makes the integration create them, since in mode 0 it only offers automation
-  triggers. Moving between the two removes or recreates those sensors in Home
-  Assistant, with any area or name given to them there.
+- **The inputs: one line of settings, then two rules.** The Inputs step sends
+  `Backlog SetOption114 1; SwitchMode0 2`, then `Rule1` with
+  `ON Switch1#State DO Power1 TOGGLE ENDON` and so on up to input 8, `Rule2`
+  with inputs 9 to 16, each rule on a line of its own, never inside a
+  `Backlog`, and `Backlog Rule1 1; Rule2 1`. Every input toggles the relay
+  with the same number, on the board itself, so a wall switch works with no
+  Home Assistant and no network, and the 16 inputs show up in Home Assistant
+  next to the relays. The rules take 319 and 333 of the 511 characters a rule
+  holds, and `Rule3` stays free.
+- **Why it works**, read from the firmware code: with `SetOption114 1` an
+  input never drives a relay by itself, but every change still reaches the
+  rules through `SendKey` and is published at once (`SwitchHandler` in
+  `support_switch_v4.ino`), and Tasmota announces the inputs only with
+  `SetOption114 1` (`xdrv_12_discovery.ino`). In `SwitchMode 2` a closed
+  contact sends `1` and an open one `0`, and a rule with no value
+  (`Switch1#State`) fires on both, so every flip toggles the relay: the switch
+  position never has to match the relay when Home Assistant switches it too.
+  Mode 2 is also what makes the integration create binary sensors; in mode 0
+  it only offers automation triggers. Nothing should toggle at boot, since the
+  inputs are read as they are when Tasmota starts (`Pcf8574AddSwitch` in
+  `xdrv_28_pcf8574_v2.ino`) and ignored for the first 4 seconds. Checked on
+  two boards in a client's restaurant on 25 October 2026, switch by switch:
+  every flip toggles its relay and the input changes in Home Assistant at
+  once.
+- **Per channel**, change that input's part and send the whole rule again:
+  another relay is another number after `Power`; a pushbutton, the kind that
+  springs back, keeps mode 2 and uses `Switch3#State=1`, the press; an input
+  that only informs Home Assistant, or a free one, is left out of the rule.
+  `PulseTime<n>` turns relay `n` off by itself after a while: 1 to 111 are
+  tenths of a second, above that it is seconds plus 100, and `0` removes the
+  pulse (`SetPulseTimer` in `support_tasmota.ino`). Four relays pulsing half a
+  second, for a gate, a door strike or an impulse relay:
+  `Backlog PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
+- **Optional names**: `Backlog SwitchText1 IN1; SwitchText2 IN2; ...` up to
+  16 shows the inputs as `IN1` to `IN16` in Home Assistant instead of
+  `Switch1` to `Switch16`. Send it before the board joins Home Assistant,
+  since the entity id is born from the first name. The rules keep calling
+  them `Switch1` to `Switch16`.
+- **The variant, no rules**:
+  `Backlog SetOption114 0; SwitchMode0 0; Rule1 0; Rule2 0`. Tasmota itself
+  ties each input to its relay (`SwitchMode<n> 3` for a pushbutton), and Home
+  Assistant shows only the relays, since Tasmota no longer announces the
+  inputs. Moving between the two removes or recreates the 16 input sensors in
+  Home Assistant, with any area or name given to them there.
 
 ### The A16v3 files, strip and display
 

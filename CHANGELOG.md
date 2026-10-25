@@ -11,6 +11,12 @@ shown at the bottom of the page.
 
 ## [Unreleased]
 
+## [2026.10.3] - 2026-10-25
+
+### Changed
+
+- **A16v3 inputs show up in Home Assistant, and each one still toggles its own relay, through rules.** The Inputs step now sends `Backlog SetOption114 1; SwitchMode0 2`, then two rules, `Rule1` for inputs 1 to 8 and `Rule2` for 9 to 16, each `ON Switch<n>#State DO Power<n> TOGGLE ENDON` (319 and 333 characters of the 511 a rule holds), each on its own copy button and never inside a `Backlog`, then `Backlog Rule1 1; Rule2 1`. With `SetOption114 1` an input never drives a relay by itself but still reaches the rules and is announced to Home Assistant, which creates the 16 inputs as binary sensors next to the relays; in `SwitchMode 2` a rule with no value fires on both edges, so every flip of a wall switch toggles the relay, on the board, with no Home Assistant and no network. Per channel the step says how to point an input at another relay, make it a pushbutton (`Switch<n>#State=1`, mode 2 kept) or leave it out of the rule, and an optional `SwitchText1` to `SwitchText16` line names the inputs `IN1` to `IN16`. The previous setup, `SetOption114 0; SwitchMode0 0`, became the variant, with `Rule1 0; Rule2 0` added so it also undoes the rules. The README's table and notes follow. Checked on two boards in a client's restaurant on 25 October 2026, switch by switch: every flip toggles its relay and the input changes in Home Assistant at once.
+
 ## [2026.10.2] - 2026-10-23
 
 ### Added
@@ -75,7 +81,8 @@ shown at the bottom of the page.
 - **Three links led to a private repository.** The two "full guide" links and the one in the footer opened only for someone with access to it. They are gone rather than promising a page the reader cannot open; the AG8 card points at Tasmota IR, which is public.
 - **What it takes to go back to KCS.** The page claimed KinCony does not publish the KCS image and that without a backup there was no way back. They do publish it, on their [forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), one zip per board and no account needed, and the file inside is a complete image with bootloader and partition table, so `write_flash 0x0` restores it. The backup still matters, for the settings, the scenes and the IR codes learned into the KCS slots, which no download brings back.
 
-[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.2...HEAD
+[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.3...HEAD
+[2026.10.3]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.2...v2026.10.3
 [2026.10.2]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.1...v2026.10.2
 [2026.10.1]: https://github.com/self-labs/tasmota-kincony/compare/v2026.9.1...v2026.10.1
 [2026.9.1]: https://github.com/self-labs/tasmota-kincony/releases/tag/v2026.9.1

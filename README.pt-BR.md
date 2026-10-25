@@ -122,7 +122,7 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
 | Template           | o `Template {...}` do card, e depois o `Module 0` sozinho                                 |
 | Ethernet           | `EthType 8`                                                                               |
 | Os dois arquivos   | `pcf8574.dat` e `display.ini` em **Tools → Manage File system**, e depois `Restart 1`     |
-| Entradas           | `Backlog SetOption114 0; SwitchMode0 0`                                                   |
+| Entradas           | `Backlog SetOption114 1; SwitchMode0 2`, depois a `Rule1` e a `Rule2` do card, cada uma sozinha, e `Backlog Rule1 1; Rule2 1` |
 | Proteção e relógio | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                       |
 | Fita de LED        | `Backlog Pixels 7; Dimmer 30`, só com uma fita ligada                                     |
 
@@ -141,32 +141,49 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
   (`tasmota.ino`). Estas placas voltam disso sem relés e sem ethernet.
 - **`Timezone`**: o Tasmota vem em UTC+1 (`APP_TIMEZONE 1`). `-3` é o horário
   de Brasília; use o seu fuso.
-- **`SetOption114 0`** faz cada entrada da A16v3 comandar o relé de mesmo
-  número, sempre, na própria placa, então a tecla de parede funciona sem Home
-  Assistant e sem rede (`support_switch_v4.ino`). É o padrão do Tasmota,
-  escrito por extenso para também desfazer a variante abaixo. O Home Assistant
-  passa a mostrar os 16 relés e não as entradas, que o Tasmota deixa de
-  anunciar (`xdrv_12_discovery.ino`).
-- **`SwitchMode0 0`** é para interruptores, as teclas de parede que ficam na
-  posição, o caso mais comum: cada virada inverte o relé, então a posição da
-  tecla nunca precisa bater com o relé quando o Home Assistant também o
-  aciona. Nada inverte no boot, porque as entradas são lidas como estão quando
-  o Tasmota inicia (`Pcf8574AddSwitch` em `xdrv_28_pcf8574_v2.ino`) e
-  ignoradas nos primeiros 4 segundos.
-- **Por canal**, e cada entrada continua com o seu relé: `SwitchMode<n> 3` põe
-  na entrada `n` um pulsador, o botão que volta sozinho, em que cada aperto
-  inverte o relé e soltar não faz nada. `PulseTime<n>` desliga o relé `n`
-  sozinho depois de um tempo: de 1 a 111 são décimos de segundo, acima disso
-  são segundos mais 100, e `0` tira o pulso (`SetPulseTimer` em
-  `support_tasmota.ino`). Um pulsador na entrada 1 e quatro relés dando pulso
-  de meio segundo, para portão, fechadura ou relé de impulso:
-  `Backlog SwitchMode1 3; PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
-- **A variante, entradas só para o Home Assistant**:
-  `Backlog SetOption114 1; SwitchMode0 2`. As entradas param de acionar os
-  relés e aparecem como 16 sensores binários, com contato fechado como ligado;
-  o modo 2 é o que faz a integração criá-los, porque no modo 0 ela só oferece
-  gatilhos de automação. Trocar entre as duas remove ou recria esses sensores
-  no Home Assistant, junto com qualquer área ou nome dado a eles lá.
+- **As entradas: uma linha de ajustes e depois duas regras.** O passo
+  Entradas manda `Backlog SetOption114 1; SwitchMode0 2`, depois a `Rule1`
+  com `ON Switch1#State DO Power1 TOGGLE ENDON` e assim até a entrada 8, a
+  `Rule2` com as entradas 9 a 16, cada regra numa linha só dela, nunca dentro
+  de um `Backlog`, e `Backlog Rule1 1; Rule2 1`. Cada entrada inverte o relé
+  de mesmo número, na própria placa, então a tecla de parede funciona sem Home
+  Assistant e sem rede, e as 16 entradas aparecem no Home Assistant ao lado
+  dos relés. As regras ocupam 319 e 333 dos 511 caracteres que cabem numa
+  regra, e a `Rule3` fica livre.
+- **Por que funciona**, lido no código do firmware: com o `SetOption114 1` a
+  entrada nunca aciona o relé sozinha, mas cada mudança continua chegando às
+  regras pelo `SendKey` e é publicada na hora (`SwitchHandler` em
+  `support_switch_v4.ino`), e o Tasmota só anuncia as entradas com o
+  `SetOption114 1` (`xdrv_12_discovery.ino`). No `SwitchMode 2` o contato
+  fechado manda `1` e o aberto `0`, e uma regra sem valor (`Switch1#State`)
+  atende os dois, então cada virada inverte o relé: a posição da tecla nunca
+  precisa bater com o relé quando o Home Assistant também o aciona. O modo 2 é
+  também o que faz a integração criar sensores binários; no modo 0 ela só
+  oferece gatilhos de automação. Nada deve inverter no boot, porque as
+  entradas são lidas como estão quando o Tasmota inicia (`Pcf8574AddSwitch` em
+  `xdrv_28_pcf8574_v2.ino`) e ignoradas nos primeiros 4 segundos. Conferido em
+  25/10/2026 nas duas placas de um restaurante, tecla por tecla: cada virada
+  inverte o relé dela, e a entrada muda no Home Assistant na hora.
+- **Por canal**, troque o pedaço daquela entrada e mande a regra inteira de
+  novo: outro relé é outro número depois do `Power`; um pulsador, o botão que
+  volta sozinho, continua no modo 2 e usa `Switch3#State=1`, o aperto; uma
+  entrada que só informa o Home Assistant, ou uma livre, sai da regra.
+  `PulseTime<n>` desliga o relé `n` sozinho depois de um tempo: de 1 a 111 são
+  décimos de segundo, acima disso são segundos mais 100, e `0` tira o pulso
+  (`SetPulseTimer` em `support_tasmota.ino`). Quatro relés dando pulso de meio
+  segundo, para portão, fechadura ou relé de impulso:
+  `Backlog PulseTime13 5; PulseTime14 5; PulseTime15 5; PulseTime16 5`.
+- **Nomes, se quiser**: `Backlog SwitchText1 IN1; SwitchText2 IN2; ...` até
+  16 mostra as entradas como `IN1` a `IN16` no Home Assistant, em vez de
+  `Switch1` a `Switch16`. Mande antes de a placa entrar no Home Assistant,
+  porque o ID da entidade nasce do primeiro nome. As regras continuam
+  chamando as entradas de `Switch1` a `Switch16`.
+- **A variante, sem regras**:
+  `Backlog SetOption114 0; SwitchMode0 0; Rule1 0; Rule2 0`. O próprio Tasmota
+  liga cada entrada ao seu relé (`SwitchMode<n> 3` para um pulsador), e o Home
+  Assistant mostra só os relés, porque o Tasmota deixa de anunciar as
+  entradas. Trocar entre as duas remove ou recria os 16 sensores de entrada no
+  Home Assistant, junto com qualquer área ou nome dado a eles lá.
 
 ### Os arquivos, a fita e o display da A16v3
 

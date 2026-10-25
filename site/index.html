@@ -543,6 +543,9 @@
         background: #2fb344;
         box-shadow: 0 0 0 3px color-mix(in srgb, #2fb344 22%, transparent);
       }
+      .status + .status {
+        margin-top: 0;
+      }
       .dot.warn {
         background: #e0a12c;
         box-shadow: 0 0 0 3px color-mix(in srgb, #e0a12c 22%, transparent);
@@ -1220,31 +1223,58 @@
                     </div>
                   </li>
                   <li>
-                    <span data-i18n="a16.step.inputs"><strong>Inputs.</strong> Each input drives the relay with
-                    the same number, always. One line, two settings:</span>
+                    <span data-i18n="a16.step.inputs"><strong>Inputs.</strong> Every input toggles the relay
+                    with the same number, on the board itself, and all 16 show up
+                    in Home Assistant next to the relays. One line of settings,
+                    then each rule on a line of its own, then one line that turns
+                    both rules on:</span>
                     <div class="code">
-                      <pre id="a16-inputs">Backlog SetOption114 0; SwitchMode0 0</pre>
+                      <pre id="a16-inputs">Backlog SetOption114 1; SwitchMode0 2</pre>
                       <button class="copy-btn" data-copy="a16-inputs">Copy</button>
                     </div>
+                    <div class="code">
+                      <pre id="a16-rule1">Rule1 ON Switch1#State DO Power1 TOGGLE ENDON ON Switch2#State DO Power2 TOGGLE ENDON ON Switch3#State DO Power3 TOGGLE ENDON ON Switch4#State DO Power4 TOGGLE ENDON ON Switch5#State DO Power5 TOGGLE ENDON ON Switch6#State DO Power6 TOGGLE ENDON ON Switch7#State DO Power7 TOGGLE ENDON ON Switch8#State DO Power8 TOGGLE ENDON</pre>
+                      <button class="copy-btn" data-copy="a16-rule1">Copy</button>
+                    </div>
+                    <div class="code">
+                      <pre id="a16-rule2">Rule2 ON Switch9#State DO Power9 TOGGLE ENDON ON Switch10#State DO Power10 TOGGLE ENDON ON Switch11#State DO Power11 TOGGLE ENDON ON Switch12#State DO Power12 TOGGLE ENDON ON Switch13#State DO Power13 TOGGLE ENDON ON Switch14#State DO Power14 TOGGLE ENDON ON Switch15#State DO Power15 TOGGLE ENDON ON Switch16#State DO Power16 TOGGLE ENDON</pre>
+                      <button class="copy-btn" data-copy="a16-rule2">Copy</button>
+                    </div>
+                    <div class="code">
+                      <pre id="a16-rules-on">Backlog Rule1 1; Rule2 1</pre>
+                      <button class="copy-btn" data-copy="a16-rules-on">Copy</button>
+                    </div>
                     <ul class="why" data-i18n="a16.step.inputs.why">
-                      <li><code>SetOption114 0</code>: input 1 switches relay 1, and so on up to 16, on the board itself, with no Home Assistant and no network. It is Tasmota's default, written out so it also undoes the variant below.</li>
-                      <li><code>SwitchMode0 0</code>: for latching switches, the wall switches that stay where you leave them, the usual case. Every flip toggles the relay, so the switch position never has to match the relay when Home Assistant switches it too.</li>
-                      <li>Pushbuttons and pulsing outputs are set per channel, and the input keeps its relay. <code>SwitchMode1 3</code> gives input 1 a pushbutton, the kind that springs back: each press toggles the relay, and releasing does nothing. <code>PulseTime13 5</code> turns relay 13 off by itself after 0.5 s: 1 to 111 are tenths of a second, above that it is seconds plus 100, and <code>0</code> removes the pulse.</li>
-                      <li>Home Assistant shows the 16 relays, not the inputs: with <code>SetOption114 0</code> Tasmota does not announce them.</li>
+                      <li><code>SetOption114 1</code>: an input no longer drives a relay by itself. Every change still reaches the rules and goes out at once, and Tasmota announces the inputs, so Home Assistant creates them as binary sensors.</li>
+                      <li><code>SwitchMode0 2</code>: a closed contact reads on and an open one off. A rule with no value, like <code>Switch1#State</code>, fires on both, so every flip of a wall switch toggles the relay, and the switch position never has to match the relay when Home Assistant switches it too. In mode 0, Home Assistant would only offer the inputs as automation triggers.</li>
+                      <li>The rules live on the board and run there, with no Home Assistant and no network, and nothing toggles at boot: the inputs are read as they are when Tasmota starts and ignored for the first 4 seconds. Send each rule on its own line, never inside a <code>Backlog</code>, which splits on <code>;</code>. They take 319 and 333 of the 511 characters a rule holds, and <code>Rule3</code> stays free for anything else the house needs.</li>
+                      <li>Per channel, change that input's part and send the whole rule again: another relay is another number after <code>Power</code>; a pushbutton, the kind that springs back, keeps mode 2 and uses <code>Switch3#State=1</code>, the press; an input that only informs Home Assistant, or a free one, is left out of the rule. <code>PulseTime13 5</code> turns relay 13 off by itself after 0.5 s: 1 to 111 are tenths of a second, above that it is seconds plus 100, and <code>0</code> removes the pulse.</li>
                     </ul>
-                    <p data-i18n="a16.step.variant">
-                      <strong>Variant: inputs for Home Assistant only.</strong>
-                      The inputs stop driving the relays and show up in Home
-                      Assistant as 16 binary sensors, and an automation decides
-                      what each one does:
+                    <p data-i18n="a16.step.names">
+                      <strong>Optional: input names.</strong> Home Assistant
+                      shows the inputs as <code>Switch1</code> to
+                      <code>Switch16</code>. To have <code>IN1</code> to
+                      <code>IN16</code> instead, send this before the board joins
+                      Home Assistant, since the entity id is born from the first
+                      name. The rules keep calling them <code>Switch1</code> to
+                      <code>Switch16</code>:
                     </p>
                     <div class="code">
-                      <pre id="a16-inputs-ha">Backlog SetOption114 1; SwitchMode0 2</pre>
-                      <button class="copy-btn" data-copy="a16-inputs-ha">Copy</button>
+                      <pre id="a16-names">Backlog SwitchText1 IN1; SwitchText2 IN2; SwitchText3 IN3; SwitchText4 IN4; SwitchText5 IN5; SwitchText6 IN6; SwitchText7 IN7; SwitchText8 IN8; SwitchText9 IN9; SwitchText10 IN10; SwitchText11 IN11; SwitchText12 IN12; SwitchText13 IN13; SwitchText14 IN14; SwitchText15 IN15; SwitchText16 IN16</pre>
+                      <button class="copy-btn" data-copy="a16-names">Copy</button>
+                    </div>
+                    <p data-i18n="a16.step.variant">
+                      <strong>Variant: no rules.</strong> Tasmota itself ties
+                      each input to its relay, and Home Assistant shows only the
+                      relays:
+                    </p>
+                    <div class="code">
+                      <pre id="a16-inputs-plain">Backlog SetOption114 0; SwitchMode0 0; Rule1 0; Rule2 0</pre>
+                      <button class="copy-btn" data-copy="a16-inputs-plain">Copy</button>
                     </div>
                     <ul class="why" data-i18n="a16.step.variant.why">
-                      <li><code>SetOption114 1</code>: closing input 1 no longer flips relay 1.</li>
-                      <li><code>SwitchMode0 2</code>: a closed contact reads on. It is also what makes Home Assistant create the inputs as sensors; in mode 0 they only show up as automation triggers.</li>
+                      <li><code>SetOption114 0</code>: input 1 switches relay 1, and so on up to 16, on the board itself, and Tasmota no longer announces the inputs. <code>SwitchMode0 0</code> is for latching switches; <code>SwitchMode1 3</code> gives input 1 a pushbutton.</li>
+                      <li><code>Rule1 0; Rule2 0</code>: the two rules are turned off, not erased.</li>
                       <li>Switching between the two removes or recreates the 16 input sensors in Home Assistant, along with any area or name given to them there.</li>
                     </ul>
                   </li>
