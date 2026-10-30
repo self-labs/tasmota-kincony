@@ -11,6 +11,12 @@ shown at the bottom of the page.
 
 ## [Unreleased]
 
+## [2026.10.4] - 2026-10-30
+
+### Added
+
+- **Optional A16v3 relay names, `OUT1` to `OUT16`.** After the input names, the Inputs step offers two more lines: `FriendlyName1` to `FriendlyName8` as `OUT1` to `OUT8`, the names Home Assistant gives relays 1 to 8, and `WebButton1` to `WebButton16` as `OUT1` to `OUT16`, the text of the relay buttons on the board's own page. Tasmota keeps only 8 relay names (`FriendlyName9` answers `Command Error`), so the step says that relays 9 to 16 arrive as `switch 9` to `switch 16` and the strip as `light 17`, to be renamed in Home Assistant itself (`config_get_friendlyname` in `hatasmota/utils.py`). Both READMEs follow. The buttons were checked on five boards in two clients on 30 October 2026, with the entity ids already in Home Assistant left untouched, and a board that joined Home Assistant that day with the names already set came in as `switch.<device>_out1` to `out8`.
+
 ## [2026.10.3] - 2026-10-25
 
 ### Changed
@@ -81,7 +87,8 @@ shown at the bottom of the page.
 - **Three links led to a private repository.** The two "full guide" links and the one in the footer opened only for someone with access to it. They are gone rather than promising a page the reader cannot open; the AG8 card points at Tasmota IR, which is public.
 - **What it takes to go back to KCS.** The page claimed KinCony does not publish the KCS image and that without a backup there was no way back. They do publish it, on their [forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), one zip per board and no account needed, and the file inside is a complete image with bootloader and partition table, so `write_flash 0x0` restores it. The backup still matters, for the settings, the scenes and the IR codes learned into the KCS slots, which no download brings back.
 
-[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.3...HEAD
+[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.4...HEAD
+[2026.10.4]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.3...v2026.10.4
 [2026.10.3]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.2...v2026.10.3
 [2026.10.2]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.1...v2026.10.2
 [2026.10.1]: https://github.com/self-labs/tasmota-kincony/compare/v2026.9.1...v2026.10.1

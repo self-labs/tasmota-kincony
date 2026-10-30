@@ -111,15 +111,15 @@ in the board's own page under **Tools → Console**.
 
 **KinCony KC868-A16v3**, seven steps:
 
-| Step                 | What to send                                                                           |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| Wi-Fi                | the installer's own screen, right after flashing                                       |
-| Template             | `Template {...}` from the card, then `Module 0` on its own                             |
-| Ethernet             | `EthType 8`                                                                            |
-| The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1` |
+| Step                 | What to send                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Wi-Fi                | the installer's own screen, right after flashing                                                                                  |
+| Template             | `Template {...}` from the card, then `Module 0` on its own                                                                        |
+| Ethernet             | `EthType 8`                                                                                                                       |
+| The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1`                                            |
 | Inputs               | `Backlog SetOption114 1; SwitchMode0 2`, then `Rule1` and `Rule2` from the card, each on its own, then `Backlog Rule1 1; Rule2 1` |
-| Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                    |
-| LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                 |
+| Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                                                               |
+| LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                                                            |
 
 ### Why each one
 
@@ -174,6 +174,14 @@ in the board's own page under **Tools → Console**.
   `Switch1` to `Switch16`. Send it before the board joins Home Assistant,
   since the entity id is born from the first name. The rules keep calling
   them `Switch1` to `Switch16`.
+- **Optional relay names**: `Backlog FriendlyName1 OUT1; ...` up to 8 names
+  relays 1 to 8 `OUT1` to `OUT8` in Home Assistant, sent before the board
+  joins it, like the input names. Tasmota keeps only 8 relay names
+  (`FriendlyName9` answers `Command Error`), so relays 9 to 16 arrive as
+  `switch 9` to `switch 16` and the strip as `light 17`, and are renamed in
+  Home Assistant itself. `Backlog WebButton1 OUT1; ...` up to 16 puts the same
+  names on the relay buttons of the board's own page; it does not reach Home
+  Assistant.
 - **The variant, no rules**:
   `Backlog SetOption114 0; SwitchMode0 0; Rule1 0; Rule2 0`. Tasmota itself
   ties each input to its relay (`SwitchMode<n> 3` for a pushbutton), and Home

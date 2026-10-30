@@ -1263,6 +1263,28 @@
                       <pre id="a16-names">Backlog SwitchText1 IN1; SwitchText2 IN2; SwitchText3 IN3; SwitchText4 IN4; SwitchText5 IN5; SwitchText6 IN6; SwitchText7 IN7; SwitchText8 IN8; SwitchText9 IN9; SwitchText10 IN10; SwitchText11 IN11; SwitchText12 IN12; SwitchText13 IN13; SwitchText14 IN14; SwitchText15 IN15; SwitchText16 IN16</pre>
                       <button class="copy-btn" data-copy="a16-names">Copy</button>
                     </div>
+                    <p data-i18n="a16.step.relaynames">
+                      <strong>Optional: relay names.</strong> Home Assistant
+                      takes the relay names from Tasmota, which ships with
+                      <code>Tasmota</code>, <code>Tasmota2</code> and so on, and
+                      keeps only 8. The first line names relays 1 to 8
+                      <code>OUT1</code> to <code>OUT8</code>; send it before the
+                      board joins Home Assistant, like the input names. Relays 9
+                      to 16 arrive as <code>switch 9</code> to
+                      <code>switch 16</code>, and the strip as
+                      <code>light 17</code>: rename those in Home Assistant
+                      itself. The second line puts <code>OUT1</code> to
+                      <code>OUT16</code> on the relay buttons of the board's own
+                      page, and does not reach Home Assistant:
+                    </p>
+                    <div class="code">
+                      <pre id="a16-relay-names">Backlog FriendlyName1 OUT1; FriendlyName2 OUT2; FriendlyName3 OUT3; FriendlyName4 OUT4; FriendlyName5 OUT5; FriendlyName6 OUT6; FriendlyName7 OUT7; FriendlyName8 OUT8</pre>
+                      <button class="copy-btn" data-copy="a16-relay-names">Copy</button>
+                    </div>
+                    <div class="code">
+                      <pre id="a16-relay-buttons">Backlog WebButton1 OUT1; WebButton2 OUT2; WebButton3 OUT3; WebButton4 OUT4; WebButton5 OUT5; WebButton6 OUT6; WebButton7 OUT7; WebButton8 OUT8; WebButton9 OUT9; WebButton10 OUT10; WebButton11 OUT11; WebButton12 OUT12; WebButton13 OUT13; WebButton14 OUT14; WebButton15 OUT15; WebButton16 OUT16</pre>
+                      <button class="copy-btn" data-copy="a16-relay-buttons">Copy</button>
+                    </div>
                     <p data-i18n="a16.step.variant">
                       <strong>Variant: no rules.</strong> Tasmota itself ties
                       each input to its relay, and Home Assistant shows only the

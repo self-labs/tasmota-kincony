@@ -165,6 +165,19 @@ window.I18N_PT = {
                       Home Assistant, porque o ID da entidade nasce do primeiro
                       nome. As regras continuam chamando as entradas de
                       <code>Switch1</code> a <code>Switch16</code>:`,
+  "a16.step.relaynames": `
+                      <strong>Opcional: nomes dos relés.</strong> O Home
+                      Assistant pega os nomes dos relés do Tasmota, que vem com
+                      <code>Tasmota</code>, <code>Tasmota2</code> e assim por
+                      diante, e guarda só 8. A primeira linha chama os relés 1 a 8
+                      de <code>OUT1</code> a <code>OUT8</code>; mande antes de a
+                      placa entrar no Home Assistant, como os nomes das entradas.
+                      Os relés 9 a 16 chegam como <code>switch 9</code> a
+                      <code>switch 16</code>, e a fita como
+                      <code>light 17</code>: renomeie esses no próprio Home
+                      Assistant. A segunda linha põe <code>OUT1</code> a
+                      <code>OUT16</code> nos botões dos relés da página da placa,
+                      e não chega ao Home Assistant:`,
   "a16.step.variant": `
                       <strong>Variante: sem regras.</strong> O próprio Tasmota
                       liga cada entrada ao seu relé, e o Home Assistant mostra só

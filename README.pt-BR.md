@@ -30,10 +30,10 @@ sem ela, a ethernet W5500 destas placas só sobe com um cabo USB ligado.
 
 ## Placas
 
-| Placa               | Build               | Situação                                                           |
-| ------------------- | ------------------- | ------------------------------------------------------------------ |
-| KinCony AG8         | `tasmota32s3-ag8`   | em uso: 8 emissores, receptor, ethernet sem USB                    |
-| KinCony KC868-A16v3 | `tasmota32s3-a16v3` | em uso: 16 relés, 16 entradas, fita de LED, ethernet sem USB       |
+| Placa               | Build               | Situação                                                     |
+| ------------------- | ------------------- | ------------------------------------------------------------ |
+| KinCony AG8         | `tasmota32s3-ag8`   | em uso: 8 emissores, receptor, ethernet sem USB              |
+| KinCony KC868-A16v3 | `tasmota32s3-a16v3` | em uso: 16 relés, 16 entradas, fita de LED, ethernet sem USB |
 
 ## Antes de gravar
 
@@ -105,26 +105,26 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
 
 **KinCony AG8**, seis passos:
 
-| Passo                         | O que mandar                                                     |
-| ----------------------------- | ---------------------------------------------------------------- |
-| Wi-Fi                         | a própria tela do instalador, logo depois de gravar              |
-| Template                      | o `Template {...}` do card, e depois o `Module 0` sozinho        |
-| Ethernet                      | `EthType 8`                                                      |
-| Aprender qualquer controle    | `SetOption58 1`                                                  |
-| Proteção e relógio            | `Backlog SetOption65 1; SetOption36 0; Timezone -3`              |
-| Home Assistant                | [Tasmota IR](https://github.com/self-labs/tasmota-ir), pelo HACS |
+| Passo                      | O que mandar                                                     |
+| -------------------------- | ---------------------------------------------------------------- |
+| Wi-Fi                      | a própria tela do instalador, logo depois de gravar              |
+| Template                   | o `Template {...}` do card, e depois o `Module 0` sozinho        |
+| Ethernet                   | `EthType 8`                                                      |
+| Aprender qualquer controle | `SetOption58 1`                                                  |
+| Proteção e relógio         | `Backlog SetOption65 1; SetOption36 0; Timezone -3`              |
+| Home Assistant             | [Tasmota IR](https://github.com/self-labs/tasmota-ir), pelo HACS |
 
 **KinCony KC868-A16v3**, sete passos:
 
-| Passo              | O que mandar                                                                              |
-| ------------------ | ----------------------------------------------------------------------------------------- |
-| Wi-Fi              | a própria tela do instalador, logo depois de gravar                                       |
-| Template           | o `Template {...}` do card, e depois o `Module 0` sozinho                                 |
-| Ethernet           | `EthType 8`                                                                               |
-| Os dois arquivos   | `pcf8574.dat` e `display.ini` em **Tools → Manage File system**, e depois `Restart 1`     |
+| Passo              | O que mandar                                                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Wi-Fi              | a própria tela do instalador, logo depois de gravar                                                                           |
+| Template           | o `Template {...}` do card, e depois o `Module 0` sozinho                                                                     |
+| Ethernet           | `EthType 8`                                                                                                                   |
+| Os dois arquivos   | `pcf8574.dat` e `display.ini` em **Tools → Manage File system**, e depois `Restart 1`                                         |
 | Entradas           | `Backlog SetOption114 1; SwitchMode0 2`, depois a `Rule1` e a `Rule2` do card, cada uma sozinha, e `Backlog Rule1 1; Rule2 1` |
-| Proteção e relógio | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                       |
-| Fita de LED        | `Backlog Pixels 7; Dimmer 30`, só com uma fita ligada                                     |
+| Proteção e relógio | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                                                           |
+| Fita de LED        | `Backlog Pixels 7; Dimmer 30`, só com uma fita ligada                                                                         |
 
 ### Para que serve cada um
 
@@ -178,6 +178,13 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
   `Switch1` a `Switch16`. Mande antes de a placa entrar no Home Assistant,
   porque o ID da entidade nasce do primeiro nome. As regras continuam
   chamando as entradas de `Switch1` a `Switch16`.
+- **Nomes dos relés, se quiser**: `Backlog FriendlyName1 OUT1; ...` até 8 chama
+  os relés 1 a 8 de `OUT1` a `OUT8` no Home Assistant, mandado antes de a placa
+  entrar nele, como os nomes das entradas. O Tasmota guarda só 8 nomes de relé
+  (`FriendlyName9` responde `Command Error`), então os relés 9 a 16 chegam como
+  `switch 9` a `switch 16` e a fita como `light 17`, e se renomeiam no próprio
+  Home Assistant. `Backlog WebButton1 OUT1; ...` até 16 põe os mesmos nomes nos
+  botões dos relés da página da placa; não chega ao Home Assistant.
 - **A variante, sem regras**:
   `Backlog SetOption114 0; SwitchMode0 0; Rule1 0; Rule2 0`. O próprio Tasmota
   liga cada entrada ao seu relé (`SwitchMode<n> 3` para um pulsador), e o Home
