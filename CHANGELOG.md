@@ -19,6 +19,7 @@ shown at the bottom of the page.
 ### Changed
 
 - **The page's favicon carries the chip too.** It is the same white mark on the Tasmota blue tile as before, now with the chip, and moved out of the inline data URI into `site/favicon.svg`, which the Pages workflow publishes with the rest of `site/`.
+- **The logo in the navigation bar carries the chip too.** It was still an inline copy of the plain Tasmota symbol; it now loads `site/favicon.svg`, so the tab and the bar show the same icon and the chip has one copy on the page. In dark mode the tile is the favicon's `#1fa3ec`, a shade darker than the `--blue` the inline copy used.
 - **`display.ini` is no longer a download on the page.** No board here turns the display on, and none is expected to. The file stays in `site/files/`, and the A16v3 template note links it for a board without the strip that wants the display; the files step and its footer now carry `pcf8574.dat` and `autoexec.be`. Both READMEs follow.
 
 ## [2026.10.4] - 2026-10-30

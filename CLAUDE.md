@@ -10,7 +10,7 @@ plain HTML in `site/`, and one workflow assembles and publishes it.
 site/
 ├── index.html            the page, with its CSS and a few lines of JavaScript inline
 ├── i18n.js               the page in Brazilian Portuguese, keyed by data-i18n
-├── favicon.svg           the icon's mark in white on the Tasmota blue tile
+├── favicon.svg           the icon's mark in white on the Tasmota blue tile (tab and nav bar)
 ├── files/                what the steps tell to upload to the board
 │   ├── pcf8574.dat       the A16v3's 32 expander pins
 │   ├── autoexec.be       the network watchdog, for both boards
