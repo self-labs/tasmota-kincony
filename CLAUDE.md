@@ -11,6 +11,10 @@ site/
 ├── index.html            the page, with its CSS and a few lines of JavaScript inline
 ├── i18n.js               the page in Brazilian Portuguese, keyed by data-i18n
 ├── favicon.svg           the icon's mark in white on the Tasmota blue tile
+├── files/                what the steps tell to upload to the board
+│   ├── pcf8574.dat       the A16v3's 32 expander pins
+│   ├── autoexec.be       the network watchdog, for both boards
+│   └── display.ini       the SSD1306, only for a board that turns it on; not linked
 └── manifests/
     ├── ag8.json          ESP Web Tools manifest for the AG8
     └── a16v3.json        ESP Web Tools manifest for the A16v3
@@ -61,6 +65,11 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
 - **Say what is unverified.** Both builds run on real boards, relays, inputs
   and Ethernet checked. A board or a feature that has not been checked on
   hardware gets an amber status line and says why.
+- **`site/files/autoexec.be` is a copy.** The source is
+  `assets/configs/tasmota/autoexec.be` in the maintainer's `homeassistant`
+  repository, where the house guides explain it and the boards in the field
+  get it from. Change both in the same breath and keep them byte for byte
+  equal (`cmp` the two files).
 - **`improv_firmware` must equal what the board announces.** The page sets
   `checkSameFirmware` to compare the board's Improv name with that field. The
   board announces `Tasmota ` plus the `CODE_IMAGE_STR` of its build, so

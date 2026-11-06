@@ -1015,7 +1015,7 @@
                 <span slot="not-allowed" data-i18n="install.notAllowed">Web Serial needs HTTPS or localhost.</span>
               </esp-web-install-button>
               <details class="steps">
-                <summary data-i18n="ag8.steps">After flashing, six steps</summary>
+                <summary data-i18n="ag8.steps">After flashing, seven steps</summary>
                 <p class="where" data-i18n="steps.where">
                   Every command below goes in the board's own page:
                   <strong>Tools → Console</strong>. Paste it, press Enter.
@@ -1064,6 +1064,23 @@
                       <pre id="ag8-eth">EthType 8</pre>
                       <button class="copy-btn" data-copy="ag8-eth">Copy</button>
                     </div>
+                  </li>
+                  <li>
+                    <span data-i18n="ag8.step.watchdog"><strong>Network watchdog.</strong> Download
+                    <a href="files/autoexec.be" download><code>autoexec.be</code></a>,
+                    the same file as the A16v3's, upload it under
+                    <strong>Tools → Manage File system</strong>, then restart.
+                    It has not run on an AG8 yet: it was checked on the A16v3,
+                    which runs the same firmware base.</span>
+                    <div class="code">
+                      <pre id="ag8-restart">Restart 1</pre>
+                      <button class="copy-btn" data-copy="ag8-restart">Copy</button>
+                    </div>
+                    <ul class="why" data-i18n="step.watchdog.why">
+                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, a board on the cable alone (Wi-Fi off with <code>Wifi 0</code>) keeps running its rules but stays off the network until someone power cycles it.</li>
+                      <li>It restarts the board when the network has not come up 10 minutes after boot, doubles the wait after each restart in a row up to 80 minutes, and goes back to 10 once the network is up. A network that came up and dropped later is left alone: a restart brings back no cable and no switch. With Wi-Fi on, a network on either side counts.</li>
+                      <li><code>EthWatchdog</code> in the console shows its state. Checked on an A16v3 by forcing the trigger: it restarted, the relays came back as they were and the script ran at boot. A board left without its cable has not been tried yet.</li>
+                    </ul>
                   </li>
                   <li>
                     <span data-i18n="ag8.step.ir"><strong>Learning any remote.</strong> Without this, a remote
@@ -1195,7 +1212,7 @@
                     </div>
                     <ul class="why" data-i18n="a16.step.template.why">
                       <li>The template already puts a WS2812 LED strip on <code>GPIO41</code>, pin 3 of the <code>P12</code> header beside the ESP32-S3 (<code>39 40 41 GND 3V3</code>). With no strip wired there, the light it creates simply lights nothing.</li>
-                      <li>The display stays off on purpose. Turning it on takes an <em>Option A3</em> mark in the template, and the display then claims a power slot of its own: after the 16 relays it becomes power 17, the strip light moves to 18 and stops answering in Home Assistant. On a board without the strip, mark <code>GPIO45</code> as <code>6210</code> and the display comes on.</li>
+                      <li>The display stays off on purpose. Turning it on takes an <em>Option A3</em> mark in the template, and the display then claims a power slot of its own: after the 16 relays it becomes power 17, the strip light moves to 18 and stops answering in Home Assistant. On a board without the strip, mark <code>GPIO45</code> as <code>6210</code> and upload <a href="https://github.com/self-labs/tasmota-kincony/blob/master/site/files/display.ini"><code>display.ini</code></a>, the SSD1306 description kept in this repository, and the display comes on.</li>
                     </ul>
                   </li>
                   <li>
@@ -1211,13 +1228,18 @@
                     <span data-i18n="a16.step.files"><strong>The two files.</strong> Download
                     <a href="files/pcf8574.dat" download><code>pcf8574.dat</code></a>
                     and
-                    <a href="files/display.ini" download><code>display.ini</code></a>,
+                    <a href="files/autoexec.be" download><code>autoexec.be</code></a>,
                     upload both under <strong>Tools → Manage File system</strong>,
                     then restart:</span>
                     <div class="code">
                       <pre id="a16-restart">Restart 1</pre>
                       <button class="copy-btn" data-copy="a16-restart">Copy</button>
                     </div>
+                    <ul class="why" data-i18n="step.watchdog.why">
+                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, a board on the cable alone (Wi-Fi off with <code>Wifi 0</code>) keeps running its rules but stays off the network until someone power cycles it.</li>
+                      <li>It restarts the board when the network has not come up 10 minutes after boot, doubles the wait after each restart in a row up to 80 minutes, and goes back to 10 once the network is up. A network that came up and dropped later is left alone: a restart brings back no cable and no switch. With Wi-Fi on, a network on either side counts.</li>
+                      <li><code>EthWatchdog</code> in the console shows its state. Checked on an A16v3 by forcing the trigger: it restarted, the relays came back as they were and the script ran at boot. A board left without its cable has not been tried yet.</li>
+                    </ul>
                   </li>
                   <li>
                     <span data-i18n="a16.step.inputs"><strong>Inputs.</strong> Every input toggles the relay
@@ -1326,8 +1348,8 @@
                 <p style="font-size: 0.88rem; color: var(--muted)" data-i18n="a16.foot">
                   Both files come from this repository. <code>pcf8574.dat</code>
                   turns the 32 expander pins into relays and inputs;
-                  <code>display.ini</code> describes the SSD1306 and is only
-                  read on a board that turns the display on (step 2).
+                  <code>autoexec.be</code> is the network watchdog, the same
+                  file as the AG8's.
                 </p>
               </details>
             </div>

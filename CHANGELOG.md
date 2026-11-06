@@ -14,10 +14,12 @@ shown at the bottom of the page.
 ### Added
 
 - **A project icon, at the top of both READMEs.** It is the Tasmota symbol with a firmware chip in the bottom right, drawn like the IR badge of `self-labs/tasmota-ir`, with a gap opened in the symbol around the chip. `assets/icon.svg` is black for light backgrounds and `assets/icon-dark.svg` is Tasmota blue for dark ones; the READMEs pick between them with `prefers-color-scheme`, and `icon.png` and `icon-dark.png` are the same two at 512 px, rendered with `rsvg-convert`, for anywhere an SVG is not taken.
+- **A network watchdog for both boards, `autoexec.be`.** Tasmota sets the Ethernet up once, at boot, and the restart it does after 100 failed Wi-Fi attempts never runs with the Wi-Fi off, so a board on the cable alone (`Wifi 0`) whose Ethernet fails at boot stays off the network until it is power cycled. The script, served from `site/files/`, restarts the board when the network has not come up 10 minutes after boot, doubling the wait after each restart in a row up to 80 minutes, and leaves alone a network that came up and dropped later; `EthWatchdog` in the console shows its state. The A16v3 uploads it with `pcf8574.dat` in step 4, and the AG8 card gains a step of its own, seven steps now. No firmware change. Checked on an A16v3 on 6 November 2026 by forcing the trigger, and running on seven boards of two clients the same day; a board left without its cable, and any AG8, are still to be tried, and the page says so. Both READMEs follow.
 
 ### Changed
 
 - **The page's favicon carries the chip too.** It is the same white mark on the Tasmota blue tile as before, now with the chip, and moved out of the inline data URI into `site/favicon.svg`, which the Pages workflow publishes with the rest of `site/`.
+- **`display.ini` is no longer a download on the page.** No board here turns the display on, and none is expected to. The file stays in `site/files/`, and the A16v3 template note links it for a board without the strip that wants the display; the files step and its footer now carry `pcf8574.dat` and `autoexec.be`. Both READMEs follow.
 
 ## [2026.10.4] - 2026-10-30
 

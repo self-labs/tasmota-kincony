@@ -105,16 +105,17 @@ application and nothing else.
 Each card on the page lists its steps, one copyable block per command, all typed
 in the board's own page under **Tools → Console**.
 
-**KinCony AG8**, six steps:
+**KinCony AG8**, seven steps:
 
-| Step                 | What to send                                                     |
-| -------------------- | ---------------------------------------------------------------- |
-| Wi-Fi                | the installer's own screen, right after flashing                 |
-| Template             | `Template {...}` from the card, then `Module 0` on its own       |
-| Ethernet             | `EthType 8`                                                      |
-| Learning any remote  | `SetOption58 1`                                                  |
-| Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`              |
-| Home Assistant       | [Tasmota IR](https://github.com/self-labs/tasmota-ir), from HACS |
+| Step                 | What to send                                                         |
+| -------------------- | -------------------------------------------------------------------- |
+| Wi-Fi                | the installer's own screen, right after flashing                     |
+| Template             | `Template {...}` from the card, then `Module 0` on its own           |
+| Ethernet             | `EthType 8`                                                          |
+| Network watchdog     | `autoexec.be` under **Tools → Manage File system**, then `Restart 1` |
+| Learning any remote  | `SetOption58 1`                                                      |
+| Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                  |
+| Home Assistant       | [Tasmota IR](https://github.com/self-labs/tasmota-ir), from HACS     |
 
 **KinCony KC868-A16v3**, seven steps:
 
@@ -123,7 +124,7 @@ in the board's own page under **Tools → Console**.
 | Wi-Fi                | the installer's own screen, right after flashing                                                                                  |
 | Template             | `Template {...}` from the card, then `Module 0` on its own                                                                        |
 | Ethernet             | `EthType 8`                                                                                                                       |
-| The two files        | `pcf8574.dat` and `display.ini` under **Tools → Manage File system**, then `Restart 1`                                            |
+| The two files        | `pcf8574.dat` and `autoexec.be` under **Tools → Manage File system**, then `Restart 1`                                            |
 | Inputs               | `Backlog SetOption114 1; SwitchMode0 2`, then `Rule1` and `Rule2` from the card, each on its own, then `Backlog Rule1 1; Rule2 1` |
 | Protection and clock | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                                                               |
 | LED strip            | `Backlog Pixels 7; Dimmer 30`, only with a strip wired                                                                            |
@@ -133,6 +134,20 @@ in the board's own page under **Tools → Console**.
 - **`Module 0`** goes as a second command because the template only takes
   effect once the module points at it. The board restarts after it.
 - **`EthType 8`** is the W5500 chip of both boards.
+- **`autoexec.be`**, the same file on both boards, is a network watchdog.
+  Tasmota sets the Ethernet up once, at boot (`EthernetInit` in
+  `xdrv_82_esp32_ethernet.ino`), and the restart it does after 100 failed Wi-Fi
+  attempts never runs with the Wi-Fi off (`support_tasmota.ino`), so a board on
+  the cable alone (`Wifi 0`) whose Ethernet fails at boot keeps its rules but
+  stays off the network until it is power cycled. The script restarts it when
+  the network has not come up 10 minutes after boot, doubling the wait after
+  each restart in a row up to 80 minutes, and back to 10 once the network is
+  up; a network that came up and dropped later is left alone, since a restart
+  brings back no cable and no switch. `EthWatchdog` in the console shows its
+  state. Checked on an A16v3 on 6 November 2026 by forcing the trigger: it
+  restarted with `Software reset CPU`, the relays came back as they were, the
+  script ran at boot and its count went back to zero. A board left without its
+  cable, and the AG8, are still to be tried.
 - **`SetOption58 1`** lets the AG8 learn remotes whose protocol the library
   does not know: their raw timings come through instead of nothing.
 - **`SetOption65 1`**: seven quick power cycles in a row erase every setting
@@ -205,8 +220,7 @@ the page:
   relays inverted. Without it the expanders are detected and nothing is
   switchable. The inputs come with their halves swapped, as measured on the
   board: the chip at `0x21` carries inputs 9 to 16, and `0x22` inputs 1 to 8.
-- `display.ini` describes the SSD1306 panel, which no longer has a build flag
-  of its own. It is only read on a board that turns the display on.
+- `autoexec.be` is the network watchdog above, the same file the AG8 gets.
 
 **The template brings a WS2812 LED strip** on `GPIO41`, pin 3 of the `P12`
 header beside the ESP32-S3 (`39 40 41 GND 3V3`, square pad on `3V3`, from
@@ -219,7 +233,10 @@ nothing. `Pixels` is how many LEDs the strip has, and `Dimmer 30` keeps it at
 (`UpdateDevicesPresent(1)` in `xdrv_13_display.ino`): after the 16 relays it
 becomes power 17, the strip light moves to 18 and stops answering in Home
 Assistant, as seen on the board. On an A16v3 without the strip, set `GPIO45` to
-`6210` in the template and the display comes on.
+`6210` in the template, upload
+[`site/files/display.ini`](./site/files/display.ini), which describes the
+SSD1306 panel (it no longer has a build flag of its own), and the display comes
+on. The page mentions it only in a note, since no board here uses the display.
 
 ## Finding the board on the network
 

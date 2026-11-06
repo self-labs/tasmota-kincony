@@ -98,6 +98,10 @@ window.I18N_PT = {
                       <li><code>SetOption65 1</code>: sete quedas de energia seguidas não apagam mais todas as configurações.</li>
                       <li><code>SetOption36 0</code>: cinco ou seis reinícios rápidos não apagam mais o template e o módulo.</li>
                       <li><code>Timezone -3</code>: horário de Brasília. O Tasmota vem em UTC+1; use o seu fuso no lugar do <code>-3</code>.</li>`,
+  "step.watchdog.why": `
+                      <li>O <code>autoexec.be</code> é um watchdog de rede. O Tasmota liga a ethernet uma vez só, no boot: quando isso falha, uma placa só no cabo (Wi-Fi desligado com <code>Wifi 0</code>) continua rodando as regras, mas fica fora da rede até alguém desligar e religar.</li>
+                      <li>Ele reinicia a placa quando a rede não subiu 10 minutos depois do boot, dobra a espera a cada reinício seguido até 80 minutos e volta a 10 assim que a rede sobe. A rede que subiu e caiu depois fica como está: reiniciar não traz cabo nem switch de volta. Com o Wi-Fi ligado, rede de qualquer um dos dois conta.</li>
+                      <li><code>EthWatchdog</code> no Console mostra o estado. Conferido numa A16v3 forçando o gatilho: ela reiniciou, os relés voltaram como estavam e o script rodou no boot. Uma placa deixada sem o cabo ainda não foi testada.</li>`,
 
   // ---- AG8 ----
   "ag8.tagline": "Hub de infravermelho, ESP32-S3",
@@ -112,7 +116,13 @@ window.I18N_PT = {
                 partir de fabricante, modo, temperatura, ventilação e aleta.`,
   "ag8.status": "Em uso aqui desde setembro de 2026, ethernet sem cabo USB",
   "ag8.install": "Instalar na AG8",
-  "ag8.steps": "Depois de gravar, seis passos",
+  "ag8.steps": "Depois de gravar, sete passos",
+  "ag8.step.watchdog": `<strong>Watchdog de rede.</strong> Baixe o
+                    <a href="files/autoexec.be" download><code>autoexec.be</code></a>,
+                    o mesmo arquivo da A16v3, envie em
+                    <strong>Tools → Manage File system</strong> e reinicie.
+                    Ainda não rodou numa AG8: foi conferido na A16v3, que roda
+                    a mesma base de firmware.`,
   "ag8.step.ir": `<strong>Aprender qualquer controle.</strong> Sem isto, um
                     controle cujo protocolo o Tasmota não conhece é ignorado;
                     com isto, os tempos crus chegam e podem ser aprendidos.`,
@@ -140,11 +150,11 @@ window.I18N_PT = {
   "a16.steps": "Depois de gravar, sete passos",
   "a16.step.template.why": `
                       <li>O template já põe uma fita de LED WS2812 no <code>GPIO41</code>, pino 3 do conector <code>P12</code> ao lado do ESP32-S3 (<code>39 40 41 GND 3V3</code>). Sem fita ligada ali, a luz que ele cria simplesmente não acende nada.</li>
-                      <li>O display fica desligado de propósito. Ligá-lo exige uma marca <em>Option A3</em> no template, e aí o display ocupa um power próprio: depois dos 16 relés ele vira o power 17, a luz da fita passa para o 18 e para de responder no Home Assistant. Numa placa sem a fita, marque o <code>GPIO45</code> como <code>6210</code> e o display liga.</li>`,
+                      <li>O display fica desligado de propósito. Ligá-lo exige uma marca <em>Option A3</em> no template, e aí o display ocupa um power próprio: depois dos 16 relés ele vira o power 17, a luz da fita passa para o 18 e para de responder no Home Assistant. Numa placa sem a fita, marque o <code>GPIO45</code> como <code>6210</code> e envie o <a href="https://github.com/self-labs/tasmota-kincony/blob/master/site/files/display.ini"><code>display.ini</code></a>, a descrição do SSD1306 guardada neste repositório, e o display liga.</li>`,
   "a16.step.files": `<strong>Os dois arquivos.</strong> Baixe o
                     <a href="files/pcf8574.dat" download><code>pcf8574.dat</code></a>
                     e o
-                    <a href="files/display.ini" download><code>display.ini</code></a>,
+                    <a href="files/autoexec.be" download><code>autoexec.be</code></a>,
                     envie os dois em <strong>Tools → Manage File system</strong>
                     e reinicie:`,
   "a16.step.inputs": `<strong>Entradas.</strong> Cada entrada inverte o relé de
@@ -194,8 +204,8 @@ window.I18N_PT = {
   "a16.foot": `
                   Os dois arquivos vêm deste repositório. O <code>pcf8574.dat</code>
                   transforma os 32 pinos dos expansores em relés e entradas; o
-                  <code>display.ini</code> descreve o SSD1306 e só é lido numa
-                  placa que liga o display (passo 2).`,
+                  <code>autoexec.be</code> é o watchdog de rede, o mesmo arquivo
+                  da AG8.`,
 
   // ---- Find a board ----
   "find.eyebrow": "Já gravada",

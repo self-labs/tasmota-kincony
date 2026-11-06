@@ -110,16 +110,17 @@ própria placa, atualiza a placa sem o site; ele troca a aplicação e nada mais
 Cada card da página lista os seus passos, com um bloco para copiar por
 comando, todos digitados na página da própria placa em **Tools → Console**.
 
-**KinCony AG8**, seis passos:
+**KinCony AG8**, sete passos:
 
-| Passo                      | O que mandar                                                     |
-| -------------------------- | ---------------------------------------------------------------- |
-| Wi-Fi                      | a própria tela do instalador, logo depois de gravar              |
-| Template                   | o `Template {...}` do card, e depois o `Module 0` sozinho        |
-| Ethernet                   | `EthType 8`                                                      |
-| Aprender qualquer controle | `SetOption58 1`                                                  |
-| Proteção e relógio         | `Backlog SetOption65 1; SetOption36 0; Timezone -3`              |
-| Home Assistant             | [Tasmota IR](https://github.com/self-labs/tasmota-ir), pelo HACS |
+| Passo                      | O que mandar                                                            |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Wi-Fi                      | a própria tela do instalador, logo depois de gravar                     |
+| Template                   | o `Template {...}` do card, e depois o `Module 0` sozinho               |
+| Ethernet                   | `EthType 8`                                                             |
+| Watchdog de rede           | o `autoexec.be` em **Tools → Manage File system**, e depois `Restart 1` |
+| Aprender qualquer controle | `SetOption58 1`                                                         |
+| Proteção e relógio         | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                     |
+| Home Assistant             | [Tasmota IR](https://github.com/self-labs/tasmota-ir), pelo HACS        |
 
 **KinCony KC868-A16v3**, sete passos:
 
@@ -128,7 +129,7 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
 | Wi-Fi              | a própria tela do instalador, logo depois de gravar                                                                           |
 | Template           | o `Template {...}` do card, e depois o `Module 0` sozinho                                                                     |
 | Ethernet           | `EthType 8`                                                                                                                   |
-| Os dois arquivos   | `pcf8574.dat` e `display.ini` em **Tools → Manage File system**, e depois `Restart 1`                                         |
+| Os dois arquivos   | `pcf8574.dat` e `autoexec.be` em **Tools → Manage File system**, e depois `Restart 1`                                         |
 | Entradas           | `Backlog SetOption114 1; SwitchMode0 2`, depois a `Rule1` e a `Rule2` do card, cada uma sozinha, e `Backlog Rule1 1; Rule2 1` |
 | Proteção e relógio | `Backlog SetOption65 1; SetOption36 0; Timezone -3`                                                                           |
 | Fita de LED        | `Backlog Pixels 7; Dimmer 30`, só com uma fita ligada                                                                         |
@@ -138,6 +139,19 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
 - **`Module 0`** vai como um segundo comando porque o template só vale depois
   que o módulo aponta para ele. A placa reinicia em seguida.
 - **`EthType 8`** é o chip W5500 das duas placas.
+- **`autoexec.be`**, o mesmo arquivo nas duas placas, é um watchdog de rede. O
+  Tasmota liga a ethernet uma vez só, no boot (`EthernetInit` em
+  `xdrv_82_esp32_ethernet.ino`), e o reinício que ele faz depois de 100
+  tentativas de Wi-Fi não roda com o Wi-Fi desligado (`support_tasmota.ino`),
+  então uma placa só no cabo (`Wifi 0`) cuja ethernet falha no boot mantém as
+  regras, mas fica fora da rede até ser religada. O script a reinicia quando a
+  rede não subiu 10 minutos depois do boot, dobrando a espera a cada reinício
+  seguido até 80 minutos, e volta a 10 quando a rede sobe; a rede que subiu e
+  caiu depois fica como está, porque reiniciar não traz cabo nem switch de
+  volta. `EthWatchdog` no Console mostra o estado. Conferido numa A16v3 em
+  06/11/2026 forçando o gatilho: reiniciou com `Software reset CPU`, os relés
+  voltaram como estavam, o script rodou no boot e a contagem voltou a zero.
+  Falta testar uma placa deixada sem o cabo, e a AG8.
 - **`SetOption58 1`** deixa a AG8 aprender controles cujo protocolo a biblioteca
   não conhece: os tempos crus chegam, em vez de nada.
 - **`SetOption65 1`**: sete quedas de energia seguidas apagam todas as
@@ -208,8 +222,7 @@ página:
   16 relés invertidos. Sem ele, os expansores são detectados e nada pode ser
   acionado. As entradas vêm com as metades trocadas, como medido na placa: o
   chip em `0x21` tem as entradas 9 a 16, e o `0x22` as entradas 1 a 8.
-- `display.ini` descreve o painel SSD1306, que não tem mais uma flag de build
-  própria. Ele só é lido numa placa que liga o display.
+- `autoexec.be` é o watchdog de rede acima, o mesmo arquivo que a AG8 recebe.
 
 **O template traz uma fita de LED WS2812** no `GPIO41`, pino 3 do conector
 `P12` ao lado do ESP32-S3 (`39 40 41 GND 3V3`, furo quadrado no `3V3`, do
@@ -223,7 +236,10 @@ roda.
 (`UpdateDevicesPresent(1)` em `xdrv_13_display.ino`): depois dos 16 relés ele
 vira o power 17, a luz da fita passa para o 18 e para de responder no Home
 Assistant, como visto na placa. Numa A16v3 sem a fita, ponha o `GPIO45` em
-`6210` no template e o display liga.
+`6210` no template, envie o
+[`site/files/display.ini`](./site/files/display.ini), que descreve o painel
+SSD1306 (ele não tem mais uma flag de build própria), e o display liga. A
+página só o cita numa nota, porque nenhuma placa daqui usa o display.
 
 ## Achar a placa na rede
 
