@@ -10,12 +10,26 @@ plain HTML in `site/`, and one workflow assembles and publishes it.
 site/
 ├── index.html            the page, with its CSS and a few lines of JavaScript inline
 ├── i18n.js               the page in Brazilian Portuguese, keyed by data-i18n
+├── favicon.svg           the icon's mark in white on the Tasmota blue tile
 └── manifests/
     ├── ag8.json          ESP Web Tools manifest for the AG8
     └── a16v3.json        ESP Web Tools manifest for the A16v3
+assets/
+├── icon.svg              project icon, black, for light backgrounds (README)
+├── icon-dark.svg         the same in Tasmota blue (#1fa3ec), for dark ones
+└── icon.png, icon-dark.png   both at 512 px, for places that take no SVG
 .github/workflows/
 └── pages.yml             fetch the latest firmware release, stamp it, publish
 ```
+
+The icon is the Tasmota symbol (`tools/logo` in `arendst/Tasmota`) with a
+firmware chip in the bottom right, in the style of the IR badge of
+`self-labs/tasmota-ir`. The SVGs are the source and are edited by hand; the
+two variants differ only in the `fill` of the outer group, and the chip and
+its mask live in `site/favicon.svg` too, so a change to the chip goes to all
+three. The PNGs are rendered from them, never edited:
+`rsvg-convert -w 512 assets/icon.svg -o assets/icon.png` (same for the dark
+one). `assets/` is outside `site/`, so it is never published.
 
 `site/firmware/` does not exist in the repository. The workflow creates it at
 deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.

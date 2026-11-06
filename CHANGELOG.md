@@ -11,6 +11,14 @@ shown at the bottom of the page.
 
 ## [Unreleased]
 
+### Added
+
+- **A project icon, at the top of both READMEs.** It is the Tasmota symbol with a firmware chip in the bottom right, drawn like the IR badge of `self-labs/tasmota-ir`, with a gap opened in the symbol around the chip. `assets/icon.svg` is black for light backgrounds and `assets/icon-dark.svg` is Tasmota blue for dark ones; the READMEs pick between them with `prefers-color-scheme`, and `icon.png` and `icon-dark.png` are the same two at 512 px, rendered with `rsvg-convert`, for anywhere an SVG is not taken.
+
+### Changed
+
+- **The page's favicon carries the chip too.** It is the same white mark on the Tasmota blue tile as before, now with the chip, and moved out of the inline data URI into `site/favicon.svg`, which the Pages workflow publishes with the rest of `site/`.
+
 ## [2026.10.4] - 2026-10-30
 
 ### Added

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170.38 170.38" width="512" height="512">
+  <!-- The Tasmota symbol (arendst/Tasmota, tools/logo) with a firmware chip in
+       the bottom right, drawn like the IR badge of self-labs/tasmota-ir. The
+       mask opens a gap in the symbol around the chip. icon.svg is this
+       file in black instead of the Tasmota blue. -->
+  <defs>
+    <g id="pins">
+      <rect x="7.65" y="2.6" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="11.15" y="2.6" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="14.65" y="2.6" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="7.65" y="18.8" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="11.15" y="18.8" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="14.65" y="18.8" width="1.7" height="2.6" rx="0.35"/>
+      <rect x="2.6" y="7.65" width="2.6" height="1.7" rx="0.35"/>
+      <rect x="2.6" y="11.15" width="2.6" height="1.7" rx="0.35"/>
+      <rect x="2.6" y="14.65" width="2.6" height="1.7" rx="0.35"/>
+      <rect x="18.8" y="7.65" width="2.6" height="1.7" rx="0.35"/>
+      <rect x="18.8" y="11.15" width="2.6" height="1.7" rx="0.35"/>
+      <rect x="18.8" y="14.65" width="2.6" height="1.7" rx="0.35"/>
+    </g>
+    <mask id="gap" maskUnits="userSpaceOnUse" x="0" y="0" width="170.38" height="170.38">
+      <rect width="170.38" height="170.38" fill="#fff"/>
+      <g transform="translate(121.106 121.106) scale(2.074)" fill="#000" stroke="#000" stroke-width="3" stroke-linejoin="round">
+        <rect x="5" y="5" width="14" height="14" rx="1.8"/>
+        <use href="#pins"/>
+      </g>
+    </mask>
+  </defs>
+  <g fill="#1fa3ec">
+    <g mask="url(#gap)">
+      <polygon points="85.19 0 0 85.19 9.73 94.93 85.19 19.47 160.65 94.93 170.38 85.19 85.19 0"/>
+      <path d="M85.19,60.08A52.6,52.6,0,0,0,66.45,161.84V146.7A38.79,38.79,0,0,1,78.31,74.5v95.88H92.08V74.5a38.79,38.79,0,0,1,11.85,72.2v15.14A52.6,52.6,0,0,0,85.19,60.08Z"/>
+    </g>
+    <g transform="translate(121.106 121.106) scale(2.074)">
+      <path fill-rule="evenodd" d="M6.8,5H17.2A1.8,1.8,0,0,1,19,6.8V17.2A1.8,1.8,0,0,1,17.2,19H6.8A1.8,1.8,0,0,1,5,17.2V6.8A1.8,1.8,0,0,1,6.8,5ZM7.9,7.5H16.1A0.4,0.4,0,0,1,16.5,7.9V16.1A0.4,0.4,0,0,1,16.1,16.5H7.9A0.4,0.4,0,0,1,7.5,16.1V7.9A0.4,0.4,0,0,1,7.9,7.5Z"/>
+      <rect x="9.6" y="9.6" width="4.8" height="4.8" rx="0.5"/>
+      <use href="#pins"/>
+    </g>
+  </g>
+</svg>
