@@ -11,6 +11,8 @@ shown at the bottom of the page.
 
 ## [Unreleased]
 
+## [2026.11.1] - 2026-11-13
+
 ### ✨ Added
 
 - **A project icon, at the top of both READMEs.** It is the Tasmota symbol with a firmware chip in the bottom right, drawn like the IR badge of `self-labs/tasmota-ir`, with a gap opened in the symbol around the chip. `assets/icon.svg` is black for light backgrounds and `assets/icon-dark.svg` is Tasmota blue for dark ones; the READMEs pick between them with `prefers-color-scheme`, and `icon.png` and `icon-dark.png` are the same two at 512 px, rendered with `rsvg-convert`, for anywhere an SVG is not taken.
@@ -99,7 +101,19 @@ shown at the bottom of the page.
 - **Three links led to a private repository.** The two "full guide" links and the one in the footer opened only for someone with access to it. They are gone rather than promising a page the reader cannot open; the AG8 card points at Tasmota IR, which is public.
 - **What it takes to go back to KCS.** The page claimed KinCony does not publish the KCS image and that without a backup there was no way back. They do publish it, on their [forum](https://www.kincony.com/forum/forumdisplay.php?fid=75), one zip per board and no account needed, and the file inside is a complete image with bootloader and partition table, so `write_flash 0x0` restores it. The backup still matters, for the settings, the scenes and the IR codes learned into the KCS slots, which no download brings back.
 
-[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.4...HEAD
+## Legend
+
+| Type          | Meaning                                 |
+| ------------- | --------------------------------------- |
+| ✨ Added      | new features                            |
+| 🔧 Changed    | changes in existing functionality       |
+| ⚠️ Deprecated | features that will be removed soon      |
+| 🗑️ Removed    | features removed in this release        |
+| 🐛 Fixed      | bug fixes                               |
+| 🔐 Security   | vulnerabilities addressed and hardening |
+
+[Unreleased]: https://github.com/self-labs/tasmota-kincony/compare/v2026.11.1...HEAD
+[2026.11.1]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.4...v2026.11.1
 [2026.10.4]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.3...v2026.10.4
 [2026.10.3]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.2...v2026.10.3
 [2026.10.2]: https://github.com/self-labs/tasmota-kincony/compare/v2026.10.1...v2026.10.2
