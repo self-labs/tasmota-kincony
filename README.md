@@ -139,15 +139,23 @@ in the board's own page under **Tools → Console**.
   `xdrv_82_esp32_ethernet.ino`), and the restart it does after 100 failed Wi-Fi
   attempts never runs with the Wi-Fi off (`support_tasmota.ino`), so a board on
   the cable alone (`Wifi 0`) whose Ethernet fails at boot keeps its rules but
-  stays off the network until it is power cycled. The script restarts it when
-  the network has not come up 10 minutes after boot, doubling the wait after
-  each restart in a row up to 80 minutes, and back to 10 once the network is
-  up; a network that came up and dropped later is left alone, since a restart
-  brings back no cable and no switch. `EthWatchdog` in the console shows its
-  state. Checked on an A16v3 on 6 November 2026 by forcing the trigger: it
+  stays off the network until it is power cycled; with the Wi-Fi on as a backup
+  it carries on over the Wi-Fi, but the cable stays out. The script restarts
+  the board when the cable has not come up 10 minutes after boot, doubling the
+  wait after each restart in a row up to 80 minutes, and back to 10 once the
+  cable is up; a cable that came up and dropped later is left alone, since a
+  restart brings back no cable and no switch. A board that fell back to the
+  Wi-Fi stays on it when the cable returns, so the script cycles the Wi-Fi
+  (`Wifi 0`, then `Wifi 1`) 5 seconds after the cable gets an address, which
+  makes MQTT reconnect over the cable. `EthWatchdog` in the console shows its
+  state (`Watches` says whether it watches the cable or the network). Checked on an A16v3 on 6 November 2026 by forcing the trigger: it
   restarted with `Software reset CPU`, the relays came back as they were, the
-  script ran at boot and its count went back to zero. A board left without its
-  cable, and the AG8, are still to be tried.
+  script ran at boot and its count went back to zero. The Wi-Fi cycle was
+  checked by hand on 13 November 2026 on an A16v3 whose MQTT stayed on the
+  Wi-Fi after the cable came back: `Wifi 0` and `Wifi 1` moved it to the cable,
+  where it stayed. Its automatic trigger (`ETH#Connected`) is loaded but not yet
+  seen firing with a real cable, and a board left without its cable is still to
+  be tried.
 - **`SetOption58 1`** lets the AG8 learn remotes whose protocol the library
   does not know: their raw timings come through instead of nothing.
 - **`SetOption65 1`**: seven quick power cycles in a row erase every setting

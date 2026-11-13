@@ -144,13 +144,22 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
   `xdrv_82_esp32_ethernet.ino`), e o reinício que ele faz depois de 100
   tentativas de Wi-Fi não roda com o Wi-Fi desligado (`support_tasmota.ino`),
   então uma placa só no cabo (`Wifi 0`) cuja ethernet falha no boot mantém as
-  regras, mas fica fora da rede até ser religada. O script a reinicia quando a
-  rede não subiu 10 minutos depois do boot, dobrando a espera a cada reinício
-  seguido até 80 minutos, e volta a 10 quando a rede sobe; a rede que subiu e
-  caiu depois fica como está, porque reiniciar não traz cabo nem switch de
-  volta. `EthWatchdog` no Console mostra o estado. Conferido numa A16v3 em
+  regras, mas fica fora da rede até ser religada; com o Wi-Fi ligado como
+  reserva ela segue no ar pelo Wi-Fi, mas o cabo continua fora. O script
+  reinicia a placa quando o cabo não subiu 10 minutos depois do boot,
+  dobrando a espera a cada reinício seguido até 80 minutos, e volta a 10 quando
+  o cabo sobe; o cabo que subiu e caiu depois fica como está, porque reiniciar
+  não traz cabo nem switch de volta. A placa que caiu para o Wi-Fi continua nele
+  quando o cabo volta, então o script faz um ciclo do Wi-Fi (`Wifi 0`, depois
+  `Wifi 1`) 5 segundos depois de o cabo ganhar endereço, e o MQTT reconecta pelo
+  cabo. `EthWatchdog` no Console mostra o estado (`Watches` diz se ele olha o
+  cabo ou a rede). Conferido numa A16v3 em
   06/11/2026 forçando o gatilho: reiniciou com `Software reset CPU`, os relés
-  voltaram como estavam, o script rodou no boot e a contagem voltou a zero.
+  voltaram como estavam, o script rodou no boot e a contagem voltou a zero. O
+  ciclo do Wi-Fi foi conferido à mão em 13/11/2026 numa A16v3 cujo MQTT ficou
+  no Wi-Fi depois de o cabo voltar: `Wifi 0` e `Wifi 1` o levaram ao cabo, onde
+  ficou. O gatilho automático (`ETH#Connected`) está carregado, mas ainda não
+  foi visto disparar com um cabo de verdade.
   Falta testar uma placa deixada sem o cabo, e a AG8.
 - **`SetOption58 1`** deixa a AG8 aprender controles cujo protocolo a biblioteca
   não conhece: os tempos crus chegam, em vez de nada.

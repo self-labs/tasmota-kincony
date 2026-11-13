@@ -1075,7 +1075,7 @@
                       <button class="copy-btn" data-copy="ag8-restart">Copy</button>
                     </div>
                     <ul class="why" data-i18n="step.watchdog.why">
-                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, a board on the cable alone (Wi-Fi off with <code>Wifi 0</code>) keeps running its rules but stays off the network until someone power cycles it.</li>
+                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, the cable stays out until someone power cycles the board (with <code>Wifi 0</code> the board is off the network; with the Wi-Fi on as a backup it carries on over the Wi-Fi). The script restarts the board when the cable has not come up and, when the cable returns while the board is on the Wi-Fi, makes MQTT reconnect over the cable.</li>
                       <li>It restarts the board when the network has not come up 10 minutes after boot, doubles the wait after each restart in a row up to 80 minutes, and goes back to 10 once the network is up. A network that came up and dropped later is left alone: a restart brings back no cable and no switch. With Wi-Fi on, a network on either side counts.</li>
                       <li><code>EthWatchdog</code> in the console shows its state. Checked on an A16v3 by forcing the trigger: it restarted, the relays came back as they were and the script ran at boot. A board left without its cable has not been tried yet.</li>
                     </ul>
@@ -1234,7 +1234,7 @@
                       <button class="copy-btn" data-copy="a16-restart">Copy</button>
                     </div>
                     <ul class="why" data-i18n="step.watchdog.why">
-                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, a board on the cable alone (Wi-Fi off with <code>Wifi 0</code>) keeps running its rules but stays off the network until someone power cycles it.</li>
+                      <li><code>autoexec.be</code> is a network watchdog. Tasmota sets the Ethernet up once, at boot: when that fails, the cable stays out until someone power cycles the board (with <code>Wifi 0</code> the board is off the network; with the Wi-Fi on as a backup it carries on over the Wi-Fi). The script restarts the board when the cable has not come up and, when the cable returns while the board is on the Wi-Fi, makes MQTT reconnect over the cable.</li>
                       <li>It restarts the board when the network has not come up 10 minutes after boot, doubles the wait after each restart in a row up to 80 minutes, and goes back to 10 once the network is up. A network that came up and dropped later is left alone: a restart brings back no cable and no switch. With Wi-Fi on, a network on either side counts.</li>
                       <li><code>EthWatchdog</code> in the console shows its state. Checked on an A16v3 by forcing the trigger: it restarted, the relays came back as they were and the script ran at boot. A board left without its cable has not been tried yet.</li>
                     </ul>

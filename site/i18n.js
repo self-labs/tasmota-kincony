@@ -99,7 +99,7 @@ window.I18N_PT = {
                       <li><code>SetOption36 0</code>: cinco ou seis reinícios rápidos não apagam mais o template e o módulo.</li>
                       <li><code>Timezone -3</code>: horário de Brasília. O Tasmota vem em UTC+1; use o seu fuso no lugar do <code>-3</code>.</li>`,
   "step.watchdog.why": `
-                      <li>O <code>autoexec.be</code> é um watchdog de rede. O Tasmota liga a ethernet uma vez só, no boot: quando isso falha, uma placa só no cabo (Wi-Fi desligado com <code>Wifi 0</code>) continua rodando as regras, mas fica fora da rede até alguém desligar e religar.</li>
+                      <li>O <code>autoexec.be</code> é um watchdog de rede. O Tasmota liga a ethernet uma vez só, no boot: quando isso falha, o cabo fica fora até alguém desligar e religar (com <code>Wifi 0</code> a placa fica fora da rede; com o Wi-Fi ligado como reserva ela segue no ar por ele). O script reinicia a placa quando o cabo não subiu e, quando o cabo volta com a placa no Wi-Fi, faz o MQTT reconectar pelo cabo.</li>
                       <li>Ele reinicia a placa quando a rede não subiu 10 minutos depois do boot, dobra a espera a cada reinício seguido até 80 minutos e volta a 10 assim que a rede sobe. A rede que subiu e caiu depois fica como está: reiniciar não traz cabo nem switch de volta. Com o Wi-Fi ligado, rede de qualquer um dos dois conta.</li>
                       <li><code>EthWatchdog</code> no Console mostra o estado. Conferido numa A16v3 forçando o gatilho: ela reiniciou, os relés voltaram como estavam e o script rodou no boot. Uma placa deixada sem o cabo ainda não foi testada.</li>`,
 
