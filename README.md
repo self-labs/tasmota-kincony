@@ -98,7 +98,12 @@ the board.
 
 Uploading the plain `.bin` of the release under **Firmware Upgrade**, in the
 board's own web interface, updates a board without the site; it replaces the
-application and nothing else.
+application and nothing else. The upload restarts the board into its safeboot
+partition first, and safeboot does not bring the Ethernet up: the page then
+answers only at the board's **Wi-Fi** address, so keep the Wi-Fi on as a backup
+of the cable (a board with `Wifi 0` has no network at that moment). Checked on an
+A16v3 on 13 November 2026: the cable stayed down during safeboot, the upload over
+the Wi-Fi updated the board and its configuration was intact.
 
 ## Setting the board up after flashing
 
@@ -153,9 +158,13 @@ in the board's own page under **Tools → Console**.
   script ran at boot and its count went back to zero. The Wi-Fi cycle was
   checked by hand on 13 November 2026 on an A16v3 whose MQTT stayed on the
   Wi-Fi after the cable came back: `Wifi 0` and `Wifi 1` moved it to the cable,
-  where it stayed. Its automatic trigger (`ETH#Connected`) is loaded but not yet
-  seen firing with a real cable, and a board left without its cable is still to
-  be tried.
+  where it stayed. Its automatic trigger (`ETH#Connected`) was checked with a
+  real cable on an A16v3 the same day: cable pulled, MQTT moved to the Wi-Fi in
+  the same second; cable back, the cycle ran 4 seconds later and MQTT returned to
+  the cable, where it stayed. Each switchover reconnects MQTT, so the board's
+  entities in Home Assistant go `unavailable` for a fraction of a second (62 ms
+  and 384 ms measured). A board left without its cable at boot is still to be
+  tried.
 - **`SetOption58 1`** lets the AG8 learn remotes whose protocol the library
   does not know: their raw timings come through instead of nothing.
 - **`SetOption65 1`**: seven quick power cycles in a row erase every setting

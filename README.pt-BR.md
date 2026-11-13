@@ -104,6 +104,12 @@ da placa.
 
 Enviar o `.bin` simples da release em **Firmware Upgrade**, na interface web da
 própria placa, atualiza a placa sem o site; ele troca a aplicação e nada mais.
+O envio reinicia a placa antes na partição de recuperação (safeboot), e o
+safeboot não sobe a ethernet: a página passa a responder só no endereço do
+**Wi-Fi** da placa, então deixe o Wi-Fi ligado como reserva do cabo (uma placa
+com `Wifi 0` fica sem rede nesse momento). Conferido numa A16v3 em 13/11/2026:
+o cabo ficou fora do ar durante o safeboot, o envio pelo Wi-Fi atualizou a placa
+e a configuração ficou intacta.
 
 ## Configurar a placa depois de gravar
 
@@ -158,9 +164,12 @@ comando, todos digitados na página da própria placa em **Tools → Console**.
   voltaram como estavam, o script rodou no boot e a contagem voltou a zero. O
   ciclo do Wi-Fi foi conferido à mão em 13/11/2026 numa A16v3 cujo MQTT ficou
   no Wi-Fi depois de o cabo voltar: `Wifi 0` e `Wifi 1` o levaram ao cabo, onde
-  ficou. O gatilho automático (`ETH#Connected`) está carregado, mas ainda não
-  foi visto disparar com um cabo de verdade.
-  Falta testar uma placa deixada sem o cabo, e a AG8.
+  ficou. O gatilho automático (`ETH#Connected`) foi conferido com um
+  cabo de verdade numa A16v3 no mesmo dia: cabo puxado, o MQTT foi para o Wi-Fi
+  no mesmo segundo; cabo de volta, o ciclo rodou 4 segundos depois e o MQTT
+  voltou ao cabo, onde ficou. Cada troca reconecta o MQTT, então as entidades da
+  placa no Home Assistant ficam `unavailable` por uma fração de segundo (62 ms e
+  384 ms medidos). Falta testar uma placa ligada sem o cabo, e a AG8.
 - **`SetOption58 1`** deixa a AG8 aprender controles cujo protocolo a biblioteca
   não conhece: os tempos crus chegam, em vez de nada.
 - **`SetOption65 1`**: sete quedas de energia seguidas apagam todas as
