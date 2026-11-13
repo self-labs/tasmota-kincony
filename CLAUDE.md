@@ -60,8 +60,10 @@ deploy time from the latest release of `cateim/Tasmota`, and it is git-ignored.
   leftover partitions and NVS cause trouble later.
 - **The installer script is pinned with an integrity hash.** Upgrading ESP Web
   Tools means changing the version in the URL and recomputing the `sha384`
-  of that exact file. The hash covers the entry file only; the chunks it
-  imports load from the same pinned version.
+  of that exact file (`dist/web/install-button.js`; check it against
+  jsDelivr's `sha256` in `data.jsdelivr.com/v1/packages/npm/esp-web-tools@X.Y.Z`).
+  The hash covers the entry file only; the chunks it loads on demand come
+  from the same pinned version. Pinned at 10.5.2 since 13 November 2026.
 - **Say what is unverified.** Both builds run on real boards, relays, inputs
   and Ethernet checked. A board or a feature that has not been checked on
   hardware gets an amber status line and says why.
